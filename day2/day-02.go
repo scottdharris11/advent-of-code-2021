@@ -52,14 +52,6 @@ func (sub *AdvancedSubmarine) applyCommand(cmd Command) {
 }
 
 func SolveDay2Part1() {
-	/*commands := []Command{
-		{dir: "forward", unit: 5},
-		{dir: "down", unit: 5},
-		{dir: "forward", unit: 8},
-		{dir: "up", unit: 3},
-		{dir: "down", unit: 8},
-		{dir: "forward", unit: 2},
-	}*/
 	commands := readCommands("day-2-input.txt")
 
 	sub := Submarine{}
@@ -70,14 +62,6 @@ func SolveDay2Part1() {
 }
 
 func SolveDay2Part2() {
-	/*commands := []Command{
-		{dir: "forward", unit: 5},
-		{dir: "down", unit: 5},
-		{dir: "forward", unit: 8},
-		{dir: "up", unit: 3},
-		{dir: "down", unit: 8},
-		{dir: "forward", unit: 2},
-	}*/
 	commands := readCommands("day-2-input.txt")
 
 	sub := AdvancedSubmarine{}
@@ -94,6 +78,7 @@ func applyCommands(cf CommandFollower, commands []Command) {
 }
 
 func readCommands(file string) []Command {
+	//lines := []string{"forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2"}
 	lines := utils.ReadLines(file)
 	var commands []Command
 	for _, line := range lines {
