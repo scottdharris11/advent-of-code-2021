@@ -1,17 +1,21 @@
-package main
+package day1
 
-import "log"
+import (
+	"log"
 
-func solveDay1Part1() {
+	"advent-of-code-2021/utils"
+)
+
+func SolveDay1Part1() {
 	//values := []int{ 199, 200, 208, 210, 200, 207, 240, 269, 260, 263}
-	values := readIntegers("day-1-input.txt")
+	values := utils.ReadIntegers("day-1-input.txt")
 	increased := numTimesIncreased(values)
 	log.Printf("Day 1, Part 1: Increased Count %d", increased)
 }
 
-func solveDay1Part2() {
+func SolveDay1Part2() {
 	//values := []int{ 199, 200, 208, 210, 200, 207, 240, 269, 260, 263}
-	values := readIntegers("day-1-input.txt")
+	values := utils.ReadIntegers("day-1-input.txt")
 
 	valCount := len(values)
 	var sections []int

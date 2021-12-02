@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"bufio"
@@ -8,8 +8,24 @@ import (
 	"strconv"
 )
 
-// read lines from data file as integers
-func readIntegers(filename string) []int {
+// ReadLines read lines from data file as strings
+func ReadLines(filename string) []string {
+	file, err := os.Open(buildPath(filename))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer file.Close()
+
+	var values []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		values = append(values, scanner.Text())
+	}
+	return values
+}
+
+// ReadIntegers read lines from data file as integers
+func ReadIntegers(filename string) []int {
 	file, err := os.Open(buildPath(filename))
 	if err != nil {
 		log.Fatalln(err)
