@@ -14,7 +14,7 @@ func ReadLines(dir string, filename string) []string {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer file.Close()
+	defer closeFile(file)
 
 	var values []string
 	scanner := bufio.NewScanner(file)
@@ -30,7 +30,7 @@ func ReadIntegers(dir string, filename string) []int {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer file.Close()
+	defer closeFile(file)
 
 	var values []int
 	scanner := bufio.NewScanner(file)
@@ -47,4 +47,12 @@ func ReadIntegers(dir string, filename string) []int {
 // build platform independent file path
 func buildPath(dir string, filename string) string {
 	return filepath.Join(".", dir, filename)
+}
+
+// close file and log any errors
+func closeFile(file *os.File) {
+	err := file.Close()
+	if err != nil {
+		log.Println("Error closing file: ", err)
+	}
 }
