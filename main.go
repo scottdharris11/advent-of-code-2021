@@ -6,11 +6,15 @@ import (
 	"advent-of-code-2021/day3"
 )
 
+type Solver interface {
+	Solve()
+}
+
 func main() {
-	day1.SolveDay1Part1()
-	day1.SolveDay1Part2()
-	day2.SolveDay2Part1()
-	day2.SolveDay2Part2()
-	day3.SolveDay3Part1()
-	day3.SolveDay3Part2()
+	solvers := []Solver{
+		day1.Puzzle{}, day2.Puzzle{}, day3.Puzzle{},
+	}
+	for _, solver := range solvers {
+		solver.Solve()
+	}
 }

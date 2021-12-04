@@ -9,8 +9,8 @@ import (
 )
 
 // ReadLines read lines from data file as strings
-func ReadLines(filename string) []string {
-	file, err := os.Open(buildPath(filename))
+func ReadLines(dir string, filename string) []string {
+	file, err := os.Open(buildPath(dir, filename))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -25,8 +25,8 @@ func ReadLines(filename string) []string {
 }
 
 // ReadIntegers read lines from data file as integers
-func ReadIntegers(filename string) []int {
-	file, err := os.Open(buildPath(filename))
+func ReadIntegers(dir string, filename string) []int {
+	file, err := os.Open(buildPath(dir, filename))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -45,6 +45,6 @@ func ReadIntegers(filename string) []int {
 }
 
 // build platform independent file path
-func buildPath(filename string) string {
-	return filepath.Join(".", "data", filename)
+func buildPath(dir string, filename string) string {
+	return filepath.Join(".", dir, filename)
 }

@@ -6,23 +6,30 @@ import (
 	"advent-of-code-2021/utils"
 )
 
-func SolveDay3Part1() {
-	r := readDiagnosticReport("day-3-input.txt")
+type Puzzle struct{}
+
+func (Puzzle) Solve() {
+	solvePart1()
+	solvePart2()
+}
+
+func solvePart1() {
+	r := readDiagnosticReport()
 	p := r.powerRating()
 	log.Printf("Day 3, Part 1: Power Rating = %d", p)
 }
 
-func SolveDay3Part2() {
-	r := readDiagnosticReport("day-3-input.txt")
+func solvePart2() {
+	r := readDiagnosticReport()
 	o := r.oxygenRating()
 	c := r.co2ScrubberRating()
 	l := o * c
 	log.Printf("Day 3, Part 2: Oxygen Rating = %d, CO2 Rating = %d, Life Support Rating = %d", o, c, l)
 }
 
-func readDiagnosticReport(file string) DiagnosticReport {
+func readDiagnosticReport() DiagnosticReport {
 	//lines := []string{"00100", "11110", "10110", "10111", "10101", "01111", "00111", "11100", "10000", "11001", "00010", "01010"}
-	lines := utils.ReadLines(file)
+	lines := utils.ReadLines("day3", "day-3-input.txt")
 	return newDiagnosticReport(lines)
 }
 

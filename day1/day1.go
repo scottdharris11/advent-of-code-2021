@@ -6,16 +6,23 @@ import (
 	"advent-of-code-2021/utils"
 )
 
-func SolveDay1Part1() {
+type Puzzle struct{}
+
+func (Puzzle) Solve() {
+	solvePart1()
+	solvePart2()
+}
+
+func solvePart1() {
 	//values := []int{ 199, 200, 208, 210, 200, 207, 240, 269, 260, 263}
-	values := utils.ReadIntegers("day-1-input.txt")
+	values := utils.ReadIntegers("day1", "day-1-input.txt")
 	increased := numTimesIncreased(values)
 	log.Printf("Day 1, Part 1: Increased Count %d", increased)
 }
 
-func SolveDay1Part2() {
+func solvePart2() {
 	//values := []int{ 199, 200, 208, 210, 200, 207, 240, 269, 260, 263}
-	values := utils.ReadIntegers("day-1-input.txt")
+	values := utils.ReadIntegers("day1", "day-1-input.txt")
 
 	valCount := len(values)
 	var sections []int
