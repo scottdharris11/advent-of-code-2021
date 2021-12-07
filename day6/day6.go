@@ -2,6 +2,7 @@ package day6
 
 import (
 	"log"
+	"time"
 
 	"advent-of-code-2021/utils"
 )
@@ -15,14 +16,18 @@ func (Puzzle) Solve() {
 
 func solvePart1() {
 	fish := parseInput()
+	start := time.Now().UnixMilli()
 	fishCnt := simulateDays(80, &fish)
-	log.Printf("Day 6, Part 1: laternfish %d", fishCnt)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 6, Part 1 (%dms): laternfish %d", end-start, fishCnt)
 }
 
 func solvePart2() {
 	fish := parseInput()
+	start := time.Now().UnixMilli()
 	fishCnt := simulateDays(256, &fish)
-	log.Printf("Day 6, Part 2: laternfish %d", fishCnt)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 6, Part 2 (%dms): laternfish %d", end-start, fishCnt)
 }
 
 func parseInput() [9]int {

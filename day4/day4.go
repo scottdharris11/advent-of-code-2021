@@ -4,6 +4,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"advent-of-code-2021/utils"
 )
@@ -17,16 +18,20 @@ func (Puzzle) Solve() {
 
 func solvePart1() {
 	game := parseGame()
+	start := time.Now().UnixMilli()
 	winner := game.Play()
 	score := winner.unmarkedSum * game.lastCalled
-	log.Printf("Day 4, Part 1: winning score %d", score)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 4, Part 1 (%dms): winning score %d", end-start, score)
 }
 
 func solvePart2() {
 	game := parseGame()
+	start := time.Now().UnixMilli()
 	winner := game.LastWinner()
 	score := winner.unmarkedSum * game.lastCalled
-	log.Printf("Day 4, Part 2: last winning score %d", score)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 4, Part 2 (%dms): last winning score %d", end-start, score)
 }
 
 func parseGame() *Game {

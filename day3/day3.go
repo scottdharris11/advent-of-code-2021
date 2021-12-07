@@ -2,6 +2,7 @@ package day3
 
 import (
 	"log"
+	"time"
 
 	"advent-of-code-2021/utils"
 )
@@ -15,16 +16,20 @@ func (Puzzle) Solve() {
 
 func solvePart1() {
 	r := readDiagnosticReport()
+	start := time.Now().UnixMilli()
 	p := r.powerRating()
-	log.Printf("Day 3, Part 1: Power Rating = %d", p)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 3, Part 1 (%dms): Power Rating = %d", end-start, p)
 }
 
 func solvePart2() {
 	r := readDiagnosticReport()
+	start := time.Now().UnixMilli()
 	o := r.oxygenRating()
 	c := r.co2ScrubberRating()
 	l := o * c
-	log.Printf("Day 3, Part 2: Oxygen Rating = %d, CO2 Rating = %d, Life Support Rating = %d", o, c, l)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 3, Part 2 (%dms): Oxygen Rating = %d, CO2 Rating = %d, Life Support Rating = %d", end-start, o, c, l)
 }
 
 func readDiagnosticReport() DiagnosticReport {

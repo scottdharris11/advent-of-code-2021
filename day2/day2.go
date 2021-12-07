@@ -4,6 +4,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"advent-of-code-2021/utils"
 )
@@ -18,21 +19,23 @@ func (Puzzle) Solve() {
 func solvePart1() {
 	commands := readCommands()
 
+	start := time.Now().UnixMilli()
 	sub := Submarine{}
 	applyCommands(&sub, commands)
-
 	ans := sub.depth * sub.horizontal
-	log.Printf("Day 2, Part 1: Horizontal = %d, Depth = %d, Answer = %d", sub.horizontal, sub.depth, ans)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 2, Part 1 (%dms): Horizontal = %d, Depth = %d, Answer = %d", end-start, sub.horizontal, sub.depth, ans)
 }
 
 func solvePart2() {
 	commands := readCommands()
 
+	start := time.Now().UnixMilli()
 	sub := AdvancedSubmarine{}
 	applyCommands(&sub, commands)
-
 	ans := sub.depth * sub.horizontal
-	log.Printf("Day 2, Part 1: Horizontal = %d, Depth = %d, Answer = %d", sub.horizontal, sub.depth, ans)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 2, Part 1 (%dms): Horizontal = %d, Depth = %d, Answer = %d", end-start, sub.horizontal, sub.depth, ans)
 }
 
 type Command struct {

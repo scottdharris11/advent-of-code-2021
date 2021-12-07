@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Puzzle struct{}
@@ -16,16 +17,20 @@ func (Puzzle) Solve() {
 
 func solvePart1() {
 	lines := parseInput()
+	start := time.Now().UnixMilli()
 	grid := newGrid(lines, false)
 	overlaps := grid.overlaps()
-	log.Printf("Day 5, Part 1: overlapping spots %d", overlaps)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 5, Part 1 (%dms): overlapping spots %d", end-start, overlaps)
 }
 
 func solvePart2() {
 	lines := parseInput()
+	start := time.Now().UnixMilli()
 	grid := newGrid(lines, true)
 	overlaps := grid.overlaps()
-	log.Printf("Day 5, Part 2: overlapping spots %d", overlaps)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 5, Part 2 (%dms): overlapping spots %d", end-start, overlaps)
 }
 
 func parseInput() []Line {
