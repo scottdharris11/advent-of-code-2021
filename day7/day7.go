@@ -4,6 +4,7 @@ import (
 	"log"
 	"math"
 	"sort"
+	"time"
 
 	"advent-of-code-2021/utils"
 )
@@ -17,14 +18,18 @@ func (Puzzle) Solve() {
 
 func solvePart1() {
 	positions := parseInput()
+	start := time.Now().UnixMilli()
 	fuelUsed := leastFuelUsed(positions, 0)
-	log.Printf("Day 7, Part 1: Least Fuel Used %d", fuelUsed)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 7, Part 1 (%dms): Least Fuel Used %d", end-start, fuelUsed)
 }
 
 func solvePart2() {
 	positions := parseInput()
+	start := time.Now().UnixMilli()
 	fuelUsed := leastFuelUsed(positions, 1)
-	log.Printf("Day 7, Part 2: Least Fuel Used %d", fuelUsed)
+	end := time.Now().UnixMilli()
+	log.Printf("Day 7, Part 2 (%dms): Least Fuel Used %d", end-start, fuelUsed)
 }
 
 func parseInput() []int {
@@ -35,36 +40,13 @@ func parseInput() []int {
 
 func leastFuelUsed(positions []int, costAdjust int) int {
 	// before a binary search to limit the potential position solution down to a range of 2 values
-	workPositions := positions[:]
+	workPositions := removeDuplicates(positions)
 	sort.Ints(workPositions)
 	length := len(workPositions)
-	for length != 2 {
-		// Find the middle position and the next position forward with diff value
-		midIdx := int(length/2) - 1
-		posIdx1 := midIdx
-		posIdx2 := midIdx + 1
-		for ; posIdx2 < length; posIdx2++ {
-			if workPositions[posIdx1] != workPositions[posIdx2] {
-				break
-			}
-		}
-
-		// If we run to end and still have the same value, look backwards for diff value
-		if posIdx2 == length {
-			posIdx2 = posIdx1
-			posIdx1 = posIdx2 - 1
-			for ; posIdx1 >= 0; posIdx1-- {
-				if workPositions[posIdx1] != workPositions[posIdx2] {
-					break
-				}
-				posIdx2--
-			}
-		}
-
-		// All values must be equal, we have our answer
-		if posIdx1 < 0 {
-			return fuelUsed(workPositions[posIdx2], costAdjust, positions)
-		}
+	for length <= 2 {
+		// Find the middle position and the next position forward to compare
+		posIdx1 := int(length / 2)
+		posIdx2 := posIdx1 + 1
 
 		// Compare the fuel used for each value and then chop the array based on which one is least
 		val1 := fuelUsed(workPositions[posIdx1], costAdjust, positions)
@@ -77,10 +59,10 @@ func leastFuelUsed(positions []int, costAdjust int) int {
 		length = len(workPositions)
 	}
 
-	// Limited range to two values, check each value between the range for the lowest
+	// Limited range, check each value between the range for the lowest
 	fuel := fuelUsed(workPositions[0], costAdjust, positions)
 	workVal := workPositions[0] + 1
-	endVal := workPositions[1]
+	endVal := workPositions[len(workPositions)-1]
 	for workVal <= endVal {
 		f := fuelUsed(workVal, costAdjust, positions)
 		if f < fuel {
@@ -95,6 +77,14 @@ func fuelUsed(toPos int, costAdjust int, positions []int) int {
 	fuel := 0
 	for _, position := range positions {
 		steps := int(math.Abs(float64(position) - float64(toPos)))
+		if costAdjust == 0 {
+			fuel += steps
+			continue
+		}
+		if costAdjust == 1 {
+			fuel += (steps * (steps + 1)) / 2
+			continue
+		}
 		stepCost := 1
 		for i := 0; i < steps; i++ {
 			fuel += stepCost
@@ -102,4 +92,16 @@ func fuelUsed(toPos int, costAdjust int, positions []int) int {
 		}
 	}
 	return fuel
+}
+
+func removeDuplicates(values []int) []int {
+	uniqueValues := make(map[int]bool)
+	var list []int
+	for _, value := range values {
+		if _, exists := uniqueValues[value]; !exists {
+			uniqueValues[value] = true
+			list = append(list, value)
+		}
+	}
+	return list
 }
