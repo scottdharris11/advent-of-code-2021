@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 // ReadLines read lines from data file as strings
@@ -40,6 +41,21 @@ func ReadIntegers(dir string, filename string) []int {
 			log.Fatalln(err)
 		}
 		values = append(values, val)
+	}
+	return values
+}
+
+// ReadIntegersFromLine reads single line from file and parses integers from csv format
+func ReadIntegersFromLine(dir string, filename string) []int {
+	lines := ReadLines(dir, filename)
+	sValues := strings.Split(lines[0], ",")
+	var values []int
+	for _, sValue := range sValues {
+		value, err := strconv.Atoi(sValue)
+		if err != nil {
+			log.Fatalln("non-numeric value detected", sValue, err)
+		}
+		values = append(values, value)
 	}
 	return values
 }

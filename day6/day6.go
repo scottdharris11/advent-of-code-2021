@@ -2,8 +2,6 @@ package day6
 
 import (
 	"log"
-	"strconv"
-	"strings"
 
 	"advent-of-code-2021/utils"
 )
@@ -28,17 +26,12 @@ func solvePart2() {
 }
 
 func parseInput() [9]int {
-	lines := utils.ReadLines("day6", "day-6-input.txt")
-	//lines = []string{"3,4,3,1,2"}
+	values := utils.ReadIntegersFromLine("day6", "day-6-input.txt")
+	//values = []int{3,4,3,1,2}
 
 	fish := [9]int{}
-	values := strings.Split(lines[0], ",")
 	for _, value := range values {
-		daysLeft, err := strconv.Atoi(value)
-		if err != nil {
-			log.Fatalln("invalid day value found", value, err)
-		}
-		fish[daysLeft]++
+		fish[value]++
 	}
 	return fish
 }
