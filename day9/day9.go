@@ -29,7 +29,7 @@ func solvePart2() {
 	start := time.Now().UnixMilli()
 	lBasins := caveMap.largestBasinsSize()
 	end := time.Now().UnixMilli()
-	log.Printf("Day 8, Part 2 (%dms): Large Basin %d", end-start, lBasins)
+	log.Printf("Day 9, Part 2 (%dms): Large Basin %d", end-start, lBasins)
 }
 
 func parseInput() *CaveMap {
