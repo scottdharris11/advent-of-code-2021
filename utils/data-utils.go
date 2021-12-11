@@ -60,6 +60,19 @@ func ReadIntegersFromLine(dir string, filename string) []int {
 	return values
 }
 
+// ReadIntegerGrid reads grid of integers from set of lines
+func ReadIntegerGrid(lines []string) [][]int {
+	var grid [][]int
+	for _, line := range lines {
+		var gridRow []int
+		for _, r := range line {
+			gridRow = append(gridRow, int(r-'0'))
+		}
+		grid = append(grid, gridRow)
+	}
+	return grid
+}
+
 // build platform independent file path
 func buildPath(dir string, filename string) string {
 	return filepath.Join(".", dir, filename)
