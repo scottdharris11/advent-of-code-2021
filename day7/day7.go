@@ -12,30 +12,25 @@ import (
 type Puzzle struct{}
 
 func (Puzzle) Solve() {
-	solvePart1()
-	solvePart2()
+	values := utils.ReadIntegersFromLine("day7", "day-7-input.txt")
+	solvePart1(values)
+	solvePart2(values)
 }
 
-func solvePart1() {
-	positions := parseInput()
+func solvePart1(positions []int) int {
 	start := time.Now().UnixMilli()
 	fuelUsed := leastFuelUsed(positions, 0)
 	end := time.Now().UnixMilli()
 	log.Printf("Day 7, Part 1 (%dms): Least Fuel Used %d", end-start, fuelUsed)
+	return fuelUsed
 }
 
-func solvePart2() {
-	positions := parseInput()
+func solvePart2(positions []int) int {
 	start := time.Now().UnixMilli()
 	fuelUsed := leastFuelUsed(positions, 1)
 	end := time.Now().UnixMilli()
 	log.Printf("Day 7, Part 2 (%dms): Least Fuel Used %d", end-start, fuelUsed)
-}
-
-func parseInput() []int {
-	values := utils.ReadIntegersFromLine("day7", "day-7-input.txt")
-	// values = []int{16,1,2,0,4,2,7,1,2,14}
-	return values
+	return fuelUsed
 }
 
 func leastFuelUsed(positions []int, costAdjust int) int {

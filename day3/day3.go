@@ -10,32 +10,29 @@ import (
 type Puzzle struct{}
 
 func (Puzzle) Solve() {
-	solvePart1()
-	solvePart2()
+	lines := utils.ReadLines("day3", "day-3-input.txt")
+	solvePart1(lines)
+	solvePart2(lines)
 }
 
-func solvePart1() {
-	r := readDiagnosticReport()
+func solvePart1(lines []string) int {
+	r := newDiagnosticReport(lines)
 	start := time.Now().UnixMilli()
 	p := r.powerRating()
 	end := time.Now().UnixMilli()
 	log.Printf("Day 3, Part 1 (%dms): Power Rating = %d", end-start, p)
+	return p
 }
 
-func solvePart2() {
-	r := readDiagnosticReport()
+func solvePart2(lines []string) int {
+	r := newDiagnosticReport(lines)
 	start := time.Now().UnixMilli()
 	o := r.oxygenRating()
 	c := r.co2ScrubberRating()
 	l := o * c
 	end := time.Now().UnixMilli()
 	log.Printf("Day 3, Part 2 (%dms): Oxygen Rating = %d, CO2 Rating = %d, Life Support Rating = %d", end-start, o, c, l)
-}
-
-func readDiagnosticReport() DiagnosticReport {
-	lines := utils.ReadLines("day3", "day-3-input.txt")
-	// lines = []string{"00100", "11110", "10110", "10111", "10101", "01111", "00111", "11100", "10000", "11001", "00010", "01010"}
-	return newDiagnosticReport(lines)
+	return l
 }
 
 type DiagnosticReport struct {

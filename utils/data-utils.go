@@ -11,10 +11,7 @@ import (
 
 // ReadLines read lines from data file as strings
 func ReadLines(dir string, filename string) []string {
-	file, err := os.Open(buildPath(dir, filename))
-	if err != nil {
-		log.Fatalln(err)
-	}
+	file := openFile(dir, filename)
 	defer closeFile(file)
 
 	var values []string
@@ -27,10 +24,7 @@ func ReadLines(dir string, filename string) []string {
 
 // ReadIntegers read lines from data file as integers
 func ReadIntegers(dir string, filename string) []int {
-	file, err := os.Open(buildPath(dir, filename))
-	if err != nil {
-		log.Fatalln(err)
-	}
+	file := openFile(dir, filename)
 	defer closeFile(file)
 
 	var values []int
@@ -76,6 +70,18 @@ func ReadIntegerGrid(lines []string) [][]int {
 // build platform independent file path
 func buildPath(dir string, filename string) string {
 	return filepath.Join(".", dir, filename)
+}
+
+// open filename supplied.  look in current directly if not found in supplied directory
+func openFile(dir string, filename string) *os.File {
+	file, err := os.Open(buildPath(dir, filename))
+	if err != nil {
+		file, err = os.Open(buildPath(".", filename))
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+	return file
 }
 
 // close file and log any errors

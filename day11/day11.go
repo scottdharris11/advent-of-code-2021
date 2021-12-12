@@ -12,12 +12,13 @@ import (
 type Puzzle struct{}
 
 func (Puzzle) Solve() {
-	solvePart1()
-	solvePart2()
+	lines := utils.ReadLines("day11", "day-11-input.txt")
+	solvePart1(lines)
+	solvePart2(lines)
 }
 
-func solvePart1() {
-	oGrid := parseInput()
+func solvePart1(lines []string) int {
+	oGrid := parseInput(lines)
 	start := time.Now().UnixMilli()
 	for i := 0; i < 100; i++ {
 		oGrid.ExecuteStep()
@@ -25,10 +26,11 @@ func solvePart1() {
 	ans := oGrid.FlashCount()
 	end := time.Now().UnixMilli()
 	log.Printf("Day 11, Part 1 (%dms): Flash Count = %d", end-start, ans)
+	return ans
 }
 
-func solvePart2() {
-	oGrid := parseInput()
+func solvePart2(lines []string) int {
+	oGrid := parseInput(lines)
 	start := time.Now().UnixMilli()
 	step := 0
 	for {
@@ -39,23 +41,10 @@ func solvePart2() {
 	}
 	end := time.Now().UnixMilli()
 	log.Printf("Day 11, Part 2 (%dms): All Flash Step = %d", end-start, step)
+	return step
 }
 
-func parseInput() *OctoGrid {
-	lines := utils.ReadLines("day11", "day-11-input.txt")
-	/*lines = []string{
-		"5483143223",
-		"2745854711",
-		"5264556173",
-		"6141336146",
-		"6357385478",
-		"4167524645",
-		"2176841721",
-		"6882881134",
-		"4846848554",
-		"5283751526",
-	}*/
-
+func parseInput(lines []string) *OctoGrid {
 	grid := utils.ReadIntegerGrid(lines)
 	var oGrid [][]*Octo
 	for i := 0; i < len(grid); i++ {

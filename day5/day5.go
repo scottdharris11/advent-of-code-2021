@@ -11,36 +11,32 @@ import (
 type Puzzle struct{}
 
 func (Puzzle) Solve() {
-	solvePart1()
-	solvePart2()
+	sLines := utils.ReadLines("day5", "day-5-input.txt")
+	solvePart1(sLines)
+	solvePart2(sLines)
 }
 
-func solvePart1() {
-	lines := parseInput()
+func solvePart1(sLines []string) int {
+	lines := parseInput(sLines)
 	start := time.Now().UnixMilli()
 	grid := newGrid(lines, false)
 	overlaps := grid.overlaps()
 	end := time.Now().UnixMilli()
 	log.Printf("Day 5, Part 1 (%dms): overlapping spots %d", end-start, overlaps)
+	return overlaps
 }
 
-func solvePart2() {
-	lines := parseInput()
+func solvePart2(sLines []string) int {
+	lines := parseInput(sLines)
 	start := time.Now().UnixMilli()
 	grid := newGrid(lines, true)
 	overlaps := grid.overlaps()
 	end := time.Now().UnixMilli()
 	log.Printf("Day 5, Part 2 (%dms): overlapping spots %d", end-start, overlaps)
+	return overlaps
 }
 
-func parseInput() []Line {
-	sLines := utils.ReadLines("day5", "day-5-input.txt")
-	/*sLines = []string{
-		"0,9 -> 5,9", "8,0 -> 0,8", "9,4 -> 3,4", "2,2 -> 2,1",
-		"7,0 -> 7,4", "6,4 -> 2,0", "0,9 -> 2,9", "3,4 -> 1,4",
-		"0,0 -> 8,8", "5,5 -> 8,2",
-	}*/
-
+func parseInput(sLines []string) []Line {
 	var lines []Line
 	for _, sLine := range sLines {
 		pieces := strings.Split(sLine, " ")

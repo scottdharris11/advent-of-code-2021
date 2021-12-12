@@ -10,30 +10,30 @@ import (
 type Puzzle struct{}
 
 func (Puzzle) Solve() {
-	solvePart1()
-	solvePart2()
+	values := utils.ReadIntegersFromLine("day6", "day-6-input.txt")
+	solvePart1(values)
+	solvePart2(values)
 }
 
-func solvePart1() {
-	fish := parseInput()
+func solvePart1(values []int) int {
+	fish := parseInput(values)
 	start := time.Now().UnixMilli()
 	fishCnt := simulateDays(80, &fish)
 	end := time.Now().UnixMilli()
 	log.Printf("Day 6, Part 1 (%dms): laternfish %d", end-start, fishCnt)
+	return fishCnt
 }
 
-func solvePart2() {
-	fish := parseInput()
+func solvePart2(values []int) int {
+	fish := parseInput(values)
 	start := time.Now().UnixMilli()
 	fishCnt := simulateDays(256, &fish)
 	end := time.Now().UnixMilli()
 	log.Printf("Day 6, Part 2 (%dms): laternfish %d", end-start, fishCnt)
+	return fishCnt
 }
 
-func parseInput() [9]int {
-	values := utils.ReadIntegersFromLine("day6", "day-6-input.txt")
-	// values = []int{3,4,3,1,2}
-
+func parseInput(values []int) [9]int {
 	fish := [9]int{}
 	for _, value := range values {
 		fish[value]++

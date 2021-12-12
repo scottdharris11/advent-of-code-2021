@@ -11,41 +11,25 @@ import (
 type Puzzle struct{}
 
 func (Puzzle) Solve() {
-	solvePart1()
-	solvePart2()
+	lines := utils.ReadLines("day10", "day-10-input.txt")
+	solvePart1(lines)
+	solvePart2(lines)
 }
 
-func solvePart1() {
-	lines := parseInput()
+func solvePart1(lines []string) int {
 	start := time.Now().UnixMilli()
 	score := illegalSyntaxScore(lines)
 	end := time.Now().UnixMilli()
 	log.Printf("Day 10, Part 1 (%dms): %d", end-start, score)
+	return score
 }
 
-func solvePart2() {
-	lines := parseInput()
+func solvePart2(lines []string) int {
 	start := time.Now().UnixMilli()
 	score := autoCompleteScore(lines)
 	end := time.Now().UnixMilli()
 	log.Printf("Day 10, Part 2 (%dms): %d", end-start, score)
-}
-
-func parseInput() []string {
-	lines := utils.ReadLines("day10", "day-10-input.txt")
-	/*lines = []string{
-		"[({(<(())[]>[[{[]{<()<>>",
-		"[(()[<>])]({[<{<<[]>>(",
-		"{([(<{}[<>[]}>{[]{[(<()>",
-		"(((({<>}<{<{<>}{[]{[]{}",
-		"[[<[([]))<([[{}[[()]]]",
-		"[{[{({}]{}}([{[{{{}}([]",
-		"{<[[]]>}<{[{[{[]{()[[[]",
-		"[<(<(<(<{}))><([]([]()",
-		"<{([([[(<>()){}]>(<<{{",
-		"<{([{{}}[<[[[<>{}]]]>[]]",
-	}*/
-	return lines
+	return score
 }
 
 func illegalSyntaxScore(commands []string) int {

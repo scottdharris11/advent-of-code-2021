@@ -12,29 +12,30 @@ import (
 type Puzzle struct{}
 
 func (Puzzle) Solve() {
-	solvePart1()
-	solvePart2()
+	lines := utils.ReadLines("day9", "day-9-input.txt")
+	solvePart1(lines)
+	solvePart2(lines)
 }
 
-func solvePart1() {
-	caveMap := parseInput()
+func solvePart1(lines []string) int {
+	caveMap := parseInput(lines)
 	start := time.Now().UnixMilli()
 	risk := caveMap.riskOfLowPoints()
 	end := time.Now().UnixMilli()
 	log.Printf("Day 9, Part 1 (%dms): Risk Score %d", end-start, risk)
+	return risk
 }
 
-func solvePart2() {
-	caveMap := parseInput()
+func solvePart2(lines []string) int {
+	caveMap := parseInput(lines)
 	start := time.Now().UnixMilli()
 	lBasins := caveMap.largestBasinsSize()
 	end := time.Now().UnixMilli()
 	log.Printf("Day 9, Part 2 (%dms): Large Basin %d", end-start, lBasins)
+	return lBasins
 }
 
-func parseInput() *CaveMap {
-	lines := utils.ReadLines("day9", "day-9-input.txt")
-	// lines = []string{"2199943210", "3987894921", "9856789892", "8767896789", "9899965678"}
+func parseInput(lines []string) *CaveMap {
 	var hMap [][]int
 	for _, line := range lines {
 		var hMapRow []int

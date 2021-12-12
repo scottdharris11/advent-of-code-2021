@@ -14,32 +14,32 @@ const endCaveName = "end"
 type Puzzle struct{}
 
 func (Puzzle) Solve() {
-	solvePart1()
-	solvePart2()
+	lines := utils.ReadLines("day12", "day-12-input.txt")
+	solvePart1(lines)
+	solvePart2(lines)
 }
 
-func solvePart1() {
-	sCave := parseInput()
+func solvePart1(lines []string) int {
+	sCave := parseInput(lines)
 	start := time.Now().UnixMilli()
 	routes := buildRoutes(sCave, false)
+	routeCnt := len(routes)
 	end := time.Now().UnixMilli()
-	log.Printf("Day 12, Part 1 (%dms): Paths = %d", end-start, len(routes))
+	log.Printf("Day 12, Part 1 (%dms): Paths = %d", end-start, routeCnt)
+	return routeCnt
 }
 
-func solvePart2() {
-	sCave := parseInput()
+func solvePart2(lines []string) int {
+	sCave := parseInput(lines)
 	start := time.Now().UnixMilli()
 	routes := buildRoutes(sCave, true)
+	routeCnt := len(routes)
 	end := time.Now().UnixMilli()
-	log.Printf("Day 12, Part 2 (%dms): Paths = %d", end-start, len(routes))
+	log.Printf("Day 12, Part 2 (%dms): Paths = %d", end-start, routeCnt)
+	return routeCnt
 }
 
-func parseInput() *Cave {
-	lines := utils.ReadLines("day12", "day-12-input.txt")
-	// lines = []string{"start-A","start-b","A-c","A-b","b-d","A-end","b-end"}
-	// lines = []string{"dc-end","HN-start","start-kj","dc-start","dc-HN","LN-dc","HN-end","kj-sa","kj-HN","kj-dc"}
-	// lines = []string{"fs-end","he-DX","fs-he","start-DX","pj-DX","end-zg","zg-sl","zg-pj","pj-he","RW-he","fs-DX","pj-RW","zg-RW","start-pj","he-WI","zg-he","pj-fs","start-RW"}
-
+func parseInput(lines []string) *Cave {
 	var start *Cave
 	caves := make(map[string]*Cave)
 	for _, line := range lines {

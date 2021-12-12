@@ -12,21 +12,23 @@ import (
 type Puzzle struct{}
 
 func (Puzzle) Solve() {
-	solvePart1()
-	solvePart2()
+	lines := utils.ReadLines("day8", "day-8-input.txt")
+	solvePart1(lines)
+	solvePart2(lines)
 }
 
-func solvePart1() {
-	entries := parseInput()
+func solvePart1(lines []string) int {
+	entries := parseInput(lines)
 	start := time.Now().UnixMilli()
 	counts := countDigits(entries)
 	sum := sumCounts(counts, []int{1, 4, 7, 8})
 	end := time.Now().UnixMilli()
 	log.Printf("Day 8, Part 1 (%dms): %d", end-start, sum)
+	return sum
 }
 
-func solvePart2() {
-	entries := parseInput()
+func solvePart2(lines []string) int {
+	entries := parseInput(lines)
 	start := time.Now().UnixMilli()
 	ans := 0
 	for _, entry := range entries {
@@ -34,23 +36,10 @@ func solvePart2() {
 	}
 	end := time.Now().UnixMilli()
 	log.Printf("Day 8, Part 2 (%dms): %d", end-start, ans)
+	return ans
 }
 
-func parseInput() []Entry {
-	lines := utils.ReadLines("day8", "day-8-input.txt")
-	// lines = []string{"acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf"}
-	/*lines = []string{
-		"be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe",
-		"edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc",
-		"fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg",
-		"fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb",
-		"aecbfdg fbg gf bafeg dbefa fcge gcbea fcaegb dgceab fcbdga | gecf egdcabf bgf bfgea",
-		"fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf | gebdcfa ecba ca fadegcb",
-		"dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe",
-		"bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbgef",
-		"egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb",
-		"gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce",
-	}*/
+func parseInput(lines []string) []Entry {
 	var entries []Entry
 	for _, line := range lines {
 		pieces := strings.Split(line, " | ")
