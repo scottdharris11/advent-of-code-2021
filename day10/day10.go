@@ -81,7 +81,7 @@ func autoCompleteScore(commands []string) int {
 			s *= 5
 			switch stack[i] {
 			case ')':
-				s += 1
+				s++
 			case ']':
 				s += 2
 			case '}':

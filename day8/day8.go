@@ -38,7 +38,7 @@ func solvePart2() {
 
 func parseInput() []Entry {
 	lines := utils.ReadLines("day8", "day-8-input.txt")
-	//lines = []string{"acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf"}
+	// lines = []string{"acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf"}
 	/*lines = []string{
 		"be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe",
 		"edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc",
@@ -91,7 +91,7 @@ func countDigits(entries []Entry) map[int]int {
 			case 7:
 				number = 8
 			}
-			digitCounts[number] = digitCounts[number] + 1
+			digitCounts[number]++
 		}
 	}
 	return digitCounts
@@ -186,7 +186,7 @@ func buildPossiblePatterns(values [][]string) []string {
 		if l == 1 {
 			pLen := len(possible)
 			for j := 0; j < pLen; j++ {
-				possible[j] = possible[j] + values[i][0]
+				possible[j] += values[i][0]
 			}
 			continue
 		}
@@ -199,7 +199,7 @@ func buildPossiblePatterns(values [][]string) []string {
 			if j == 0 {
 				pLen := len(possible)
 				for k := 0; k < pLen; k++ {
-					possible[k] = possible[k] + values[i][0]
+					possible[k] += values[i][0]
 				}
 				continue
 			}

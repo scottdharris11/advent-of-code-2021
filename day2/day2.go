@@ -88,8 +88,8 @@ func applyCommands(cf CommandFollower, commands []Command) {
 }
 
 func readCommands() []Command {
-	//lines := []string{"forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2"}
 	lines := utils.ReadLines("day2", "day-2-input.txt")
+	// lines = []string{"forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2"}
 	var commands []Command
 	for _, line := range lines {
 		commands = append(commands, parseCommand(line))

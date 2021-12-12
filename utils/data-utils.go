@@ -38,7 +38,7 @@ func ReadIntegers(dir string, filename string) []int {
 	for scanner.Scan() {
 		val, err := strconv.Atoi(scanner.Text())
 		if err != nil {
-			log.Fatalln(err)
+			log.Panicln(err)
 		}
 		values = append(values, val)
 	}

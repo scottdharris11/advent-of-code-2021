@@ -33,8 +33,8 @@ func solvePart2() {
 }
 
 func readDiagnosticReport() DiagnosticReport {
-	//lines := []string{"00100", "11110", "10110", "10111", "10101", "01111", "00111", "11100", "10000", "11001", "00010", "01010"}
 	lines := utils.ReadLines("day3", "day-3-input.txt")
+	// lines = []string{"00100", "11110", "10110", "10111", "10101", "01111", "00111", "11100", "10000", "11001", "00010", "01010"}
 	return newDiagnosticReport(lines)
 }
 
@@ -62,13 +62,10 @@ func (d DiagnosticReport) powerRating() int {
 		bitIdx := posCnt - i - 1
 		if mostCommonBit(d.bits, i) {
 			gamma |= 1 << bitIdx
-			//fmt.Printf("Gamma OR Mask: %16b, Gamma After: %16b\n", 1<<bitIdx, gamma)
 		} else {
 			epsilon |= 1 << bitIdx
-			//fmt.Printf("Epsilon OR Mask: %16b, Epsilon After: %16b\n", 1<<bitIdx, epsilon)
 		}
 	}
-	//fmt.Printf("%d(%16b) vs %d(%16b)\n", gamma, gamma, epsilon, epsilon)
 	return gamma * epsilon
 }
 
@@ -82,7 +79,6 @@ func (d DiagnosticReport) oxygenRating() int {
 			break
 		}
 	}
-	//fmt.Println(activeLines[0])
 	return bitsToDecimal(activeLines[0])
 }
 
@@ -96,7 +92,6 @@ func (d DiagnosticReport) co2ScrubberRating() int {
 			break
 		}
 	}
-	//fmt.Println(activeLines[0])
 	return bitsToDecimal(activeLines[0])
 }
 

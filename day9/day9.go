@@ -34,7 +34,7 @@ func solvePart2() {
 
 func parseInput() *CaveMap {
 	lines := utils.ReadLines("day9", "day-9-input.txt")
-	//lines = []string{"2199943210", "3987894921", "9856789892", "8767896789", "9899965678"}
+	// lines = []string{"2199943210", "3987894921", "9856789892", "8767896789", "9899965678"}
 	var hMap [][]int
 	for _, line := range lines {
 		var hMapRow []int

@@ -32,7 +32,7 @@ func solvePart2() {
 
 func parseInput() [9]int {
 	values := utils.ReadIntegersFromLine("day6", "day-6-input.txt")
-	//values = []int{3,4,3,1,2}
+	// values = []int{3,4,3,1,2}
 
 	fish := [9]int{}
 	for _, value := range values {

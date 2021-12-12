@@ -160,5 +160,5 @@ func (o Octo) String() string {
 	if pLevel > 9 {
 		pLevel = 0
 	}
-	return fmt.Sprintf("%d", o.energyLevel)
+	return fmt.Sprintf("%d", pLevel)
 }

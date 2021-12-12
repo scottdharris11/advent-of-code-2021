@@ -34,12 +34,12 @@ func solvePart2() {
 }
 
 func parseInput() []Line {
-	sLines := []string{
+	sLines := utils.ReadLines("day5", "day-5-input.txt")
+	/*sLines = []string{
 		"0,9 -> 5,9", "8,0 -> 0,8", "9,4 -> 3,4", "2,2 -> 2,1",
 		"7,0 -> 7,4", "6,4 -> 2,0", "0,9 -> 2,9", "3,4 -> 1,4",
 		"0,0 -> 8,8", "5,5 -> 8,2",
-	}
-	sLines = utils.ReadLines("day5", "day-5-input.txt")
+	}*/
 
 	var lines []Line
 	for _, sLine := range sLines {
@@ -136,7 +136,7 @@ func (g *Grid) addLine(line Line) {
 
 	p := line.start
 	for {
-		g.points[p.x][p.y] += 1
+		g.points[p.x][p.y]++
 		if p.Equal(line.end) {
 			break
 		}

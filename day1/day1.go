@@ -15,8 +15,7 @@ func (Puzzle) Solve() {
 }
 
 func solvePart1() {
-	//values := []int{ 199, 200, 208, 210, 200, 207, 240, 269, 260, 263}
-	values := utils.ReadIntegers("day1", "day-1-input.txt")
+	values := parseInput()
 	start := time.Now().UnixMilli()
 	increased := numTimesIncreased(values)
 	end := time.Now().UnixMilli()
@@ -24,9 +23,7 @@ func solvePart1() {
 }
 
 func solvePart2() {
-	//values := []int{ 199, 200, 208, 210, 200, 207, 240, 269, 260, 263}
-	values := utils.ReadIntegers("day1", "day-1-input.txt")
-
+	values := parseInput()
 	start := time.Now().UnixMilli()
 	valCount := len(values)
 	var sections []int
@@ -36,6 +33,12 @@ func solvePart2() {
 	increased := numTimesIncreased(sections)
 	end := time.Now().UnixMilli()
 	log.Printf("Day 1, Part 2 (%dms): Increased Count %d", end-start, increased)
+}
+
+func parseInput() []int {
+	values := utils.ReadIntegers("day1", "day-1-input.txt")
+	// values = []int{199, 200, 208, 210, 200, 207, 240, 269, 260, 263}
+	return values
 }
 
 func numTimesIncreased(values []int) int {

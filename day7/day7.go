@@ -34,7 +34,7 @@ func solvePart2() {
 
 func parseInput() []int {
 	values := utils.ReadIntegersFromLine("day7", "day-7-input.txt")
-	//values = []int{16,1,2,0,4,2,7,1,2,14}
+	// values = []int{16,1,2,0,4,2,7,1,2,14}
 	return values
 }
 
@@ -45,7 +45,7 @@ func leastFuelUsed(positions []int, costAdjust int) int {
 	length := len(workPositions)
 	for length <= 2 {
 		// Find the middle position and the next position forward to compare
-		posIdx1 := int(length / 2)
+		posIdx1 := length / 2
 		posIdx2 := posIdx1 + 1
 
 		// Compare the fuel used for each value and then chop the array based on which one is least

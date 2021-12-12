@@ -8,6 +8,9 @@ import (
 	"unicode"
 )
 
+const startCaveName = "start"
+const endCaveName = "end"
+
 type Puzzle struct{}
 
 func (Puzzle) Solve() {
@@ -33,9 +36,9 @@ func solvePart2() {
 
 func parseInput() *Cave {
 	lines := utils.ReadLines("day12", "day-12-input.txt")
-	//lines = []string{"start-A","start-b","A-c","A-b","b-d","A-end","b-end"}
-	//lines = []string{"dc-end","HN-start","start-kj","dc-start","dc-HN","LN-dc","HN-end","kj-sa","kj-HN","kj-dc"}
-	//lines = []string{"fs-end","he-DX","fs-he","start-DX","pj-DX","end-zg","zg-sl","zg-pj","pj-he","RW-he","fs-DX","pj-RW","zg-RW","start-pj","he-WI","zg-he","pj-fs","start-RW"}
+	// lines = []string{"start-A","start-b","A-c","A-b","b-d","A-end","b-end"}
+	// lines = []string{"dc-end","HN-start","start-kj","dc-start","dc-HN","LN-dc","HN-end","kj-sa","kj-HN","kj-dc"}
+	// lines = []string{"fs-end","he-DX","fs-he","start-DX","pj-DX","end-zg","zg-sl","zg-pj","pj-he","RW-he","fs-DX","pj-RW","zg-RW","start-pj","he-WI","zg-he","pj-fs","start-RW"}
 
 	var start *Cave
 	caves := make(map[string]*Cave)
@@ -45,10 +48,10 @@ func parseInput() *Cave {
 		c2 := matchOrCreateCave(s[1], caves)
 		c1.connections[c2.name] = c2
 		c2.connections[c1.name] = c1
-		if c1.name == "start" {
+		if c1.name == startCaveName {
 			start = c1
 		}
-		if c2.name == "start" {
+		if c2.name == startCaveName {
 			start = c2
 		}
 	}
@@ -88,10 +91,10 @@ type Route struct {
 }
 
 func (r Route) PathWouldBeValid(c *Cave) bool {
-	if c.name == "start" {
+	if c.name == startCaveName {
 		return false
 	}
-	if c.name == "end" {
+	if c.name == endCaveName {
 		return true
 	}
 	if c.small {
@@ -141,7 +144,7 @@ func followConnections(c *Cave, r *Route, routes []*Route) []*Route {
 				smallCaveDuped: r.smallCaveDuped,
 			}
 			nRoute.AddEntry(connectingCave)
-			if connectingCave.name == "end" {
+			if connectingCave.name == endCaveName {
 				routes = append(routes, nRoute)
 				continue
 			}
