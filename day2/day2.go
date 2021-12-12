@@ -12,30 +12,54 @@ import (
 type Puzzle struct{}
 
 func (Puzzle) Solve() {
-	solvePart1()
-	solvePart2()
+	lines := utils.ReadLines("day2", "day-2-input.txt")
+	solvePart1(lines)
+	solvePart2(lines)
 }
 
-func solvePart1() {
-	commands := readCommands()
-
+func solvePart1(lines []string) int {
 	start := time.Now().UnixMilli()
+	commands := parseCommands(lines)
 	sub := Submarine{}
 	applyCommands(&sub, commands)
 	ans := sub.depth * sub.horizontal
 	end := time.Now().UnixMilli()
 	log.Printf("Day 2, Part 1 (%dms): Horizontal = %d, Depth = %d, Answer = %d", end-start, sub.horizontal, sub.depth, ans)
+	return ans
 }
 
-func solvePart2() {
-	commands := readCommands()
-
+func solvePart2(lines []string) int {
 	start := time.Now().UnixMilli()
+	commands := parseCommands(lines)
 	sub := AdvancedSubmarine{}
 	applyCommands(&sub, commands)
 	ans := sub.depth * sub.horizontal
 	end := time.Now().UnixMilli()
 	log.Printf("Day 2, Part 1 (%dms): Horizontal = %d, Depth = %d, Answer = %d", end-start, sub.horizontal, sub.depth, ans)
+	return ans
+}
+
+func parseCommands(lines []string) []Command {
+	var commands []Command
+	for _, line := range lines {
+		commands = append(commands, parseCommand(line))
+	}
+	return commands
+}
+
+func parseCommand(s string) Command {
+	pieces := strings.Split(s, " ")
+	unit, err := strconv.Atoi(pieces[1])
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return Command{dir: pieces[0], unit: unit}
+}
+
+func applyCommands(cf CommandFollower, commands []Command) {
+	for _, command := range commands {
+		cf.applyCommand(command)
+	}
 }
 
 type Command struct {
@@ -79,29 +103,4 @@ func (sub *AdvancedSubmarine) applyCommand(cmd Command) {
 	case "up":
 		sub.aim -= cmd.unit
 	}
-}
-
-func applyCommands(cf CommandFollower, commands []Command) {
-	for _, command := range commands {
-		cf.applyCommand(command)
-	}
-}
-
-func readCommands() []Command {
-	lines := utils.ReadLines("day2", "day-2-input.txt")
-	// lines = []string{"forward 5", "down 5", "forward 8", "up 3", "down 8", "forward 2"}
-	var commands []Command
-	for _, line := range lines {
-		commands = append(commands, parseCommand(line))
-	}
-	return commands
-}
-
-func parseCommand(s string) Command {
-	pieces := strings.Split(s, " ")
-	unit, err := strconv.Atoi(pieces[1])
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return Command{dir: pieces[0], unit: unit}
 }
