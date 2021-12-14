@@ -76,9 +76,6 @@ type PolymerTemplate struct {
 func (pt *PolymerTemplate) Step() {
 	nCombos := make(map[string]int)
 	for combo, count := range pt.combos {
-		if count == 0 {
-			continue
-		}
 		r := pt.rules[combo]
 		pt.counts[r] += count
 
