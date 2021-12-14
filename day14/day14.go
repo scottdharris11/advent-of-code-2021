@@ -16,7 +16,7 @@ func (Puzzle) Solve() {
 	solvePart2(lines)
 }
 
-func solvePart1(lines []string) int {
+func solvePart1(lines []string) int64 {
 	pt := parseInput(lines)
 	start := time.Now().UnixMilli()
 	for i := 0; i < 10; i++ {
@@ -28,7 +28,7 @@ func solvePart1(lines []string) int {
 	return ans
 }
 
-func solvePart2(lines []string) int {
+func solvePart2(lines []string) int64 {
 	pt := parseInput(lines)
 	start := time.Now().UnixMilli()
 	for i := 0; i < 40; i++ {
@@ -54,11 +54,11 @@ func parseInput(lines []string) *PolymerTemplate {
 
 func NewPolymerTemplate(polymer string, rules map[string]rune) *PolymerTemplate {
 	pt := PolymerTemplate{rules: rules}
-	counts := make(map[rune]int)
+	counts := make(map[rune]int64)
 	for _, r := range polymer {
 		counts[r]++
 	}
-	combos := make(map[string]int)
+	combos := make(map[string]int64)
 	for i := 1; i < len(polymer); i++ {
 		combos[polymer[i-1:i+1]]++
 	}
@@ -68,13 +68,13 @@ func NewPolymerTemplate(polymer string, rules map[string]rune) *PolymerTemplate 
 }
 
 type PolymerTemplate struct {
-	combos map[string]int
-	counts map[rune]int
+	combos map[string]int64
+	counts map[rune]int64
 	rules  map[string]rune
 }
 
 func (pt *PolymerTemplate) Step() {
-	nCombos := make(map[string]int)
+	nCombos := make(map[string]int64)
 	for combo, count := range pt.combos {
 		r := pt.rules[combo]
 		pt.counts[r] += count
@@ -87,9 +87,9 @@ func (pt *PolymerTemplate) Step() {
 	pt.combos = nCombos
 }
 
-func (pt *PolymerTemplate) Score() int {
-	max := 0
-	min := 999999999999999
+func (pt *PolymerTemplate) Score() int64 {
+	max := int64(0)
+	min := int64(999999999999999999)
 	for _, c := range pt.counts {
 		if c > max {
 			max = c

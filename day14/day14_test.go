@@ -30,11 +30,11 @@ var testValues = []string{
 }
 
 func TestSolvePart1(t *testing.T) {
-	assert.Equal(t, 1588, solvePart1(testValues))
-	assert.Equal(t, 2590, solvePart1(utils.ReadLines("day14", "day-14-input.txt")))
+	assert.Equal(t, int64(1588), solvePart1(testValues))
+	assert.Equal(t, int64(2590), solvePart1(utils.ReadLines("day14", "day-14-input.txt")))
 }
 
 func TestSolvePart2(t *testing.T) {
-	assert.Equal(t, 2188189693529, solvePart2(testValues))
-	assert.Equal(t, 2875665202438, solvePart2(utils.ReadLines("day14", "day-14-input.txt")))
+	assert.Equal(t, int64(2188189693529), solvePart2(testValues))
+	assert.Equal(t, int64(2875665202438), solvePart2(utils.ReadLines("day14", "day-14-input.txt")))
 }
