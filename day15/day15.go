@@ -3,6 +3,8 @@ package day15
 import (
 	"log"
 	"math"
+	"strconv"
+	"strings"
 	"time"
 
 	"advent-of-code-2021/utils"
@@ -12,28 +14,32 @@ type Puzzle struct{}
 
 func (Puzzle) Solve() {
 	lines := utils.ReadLines("day15", "day-15-input.txt")
-	solvePart1(lines)
-	solvePart2(lines)
+	solvePart1(lines, false)
+	solvePart2(lines, false)
 }
 
-func solvePart1(lines []string) int {
+func solvePart1(lines []string, printPath bool) int {
 	grid := NewGrid(utils.ReadIntegerGrid(lines))
 	start := time.Now().UnixMilli()
-	_, cost := search(grid, grid.nodes[0][0], grid.nodes[grid.bottomEdge][grid.rightEdge])
-	ans := cost
+	path := grid.BestPath()
 	end := time.Now().UnixMilli()
-	log.Printf("Day 15, Part 1 (%dms): Path Cost = %d", end-start, ans)
-	return ans
+	log.Printf("Day 15, Part 1 (%dms): Path Risk = %d", end-start, path.Risk)
+	if printPath {
+		log.Printf("Path Details: %s", path)
+	}
+	return path.Risk
 }
 
-func solvePart2(lines []string) int {
+func solvePart2(lines []string, printPath bool) int {
 	grid := NewGrid(expandGrid(utils.ReadIntegerGrid(lines)))
 	start := time.Now().UnixMilli()
-	_, cost := search(grid, grid.nodes[0][0], grid.nodes[grid.bottomEdge][grid.rightEdge])
-	ans := cost
+	path := grid.BestPath()
 	end := time.Now().UnixMilli()
-	log.Printf("Day 15, Part 2 (%dms): Path Cost = %d", end-start, ans)
-	return ans
+	log.Printf("Day 15, Part 2 (%dms): Path Risk = %d", end-start, path.Risk)
+	if printPath {
+		log.Printf("Path Details: %s", path)
+	}
+	return path.Risk
 }
 
 func expandGrid(grid [][]int) [][]int {
@@ -83,6 +89,50 @@ type Grid struct {
 	bottomEdge int
 }
 
+// BestPath a-star search algorithm implementation:
+//   process nodes from start to goal using a priority queue based on
+//   cost (risk) to get to the node plus the estimated distance (using
+//   manhattan distance) to the goal
+func (g *Grid) BestPath() *NodePath {
+	start := g.nodes[0][0]
+	goal := g.nodes[g.bottomEdge][g.rightEdge]
+	searchQueue := NodeQueue{}
+	searchQueue.Queue(start, 0)
+	from := make(map[Node]Node)
+	cost := make(map[Node]int)
+	visited := make(map[Node]bool)
+	cost[start] = 0
+
+	for !searchQueue.Empty() {
+		current := searchQueue.Next()
+		visited[current] = true
+		if current == goal {
+			break
+		}
+
+		for _, next := range g.neighborNodes(current) {
+			nCost := cost[current] + next.risk
+			cCost, ok := cost[next]
+			if !ok || nCost < cCost {
+				cost[next] = nCost
+				priority := nCost + g.manhattanDistance(next, goal)
+				searchQueue.Queue(next, priority)
+				from[next] = current
+			}
+		}
+	}
+
+	return &NodePath{
+		start:    start,
+		goal:     goal,
+		from:     from,
+		Risk:     cost[goal],
+		Visited:  len(visited),
+		GridSize: (g.rightEdge + 1) * (g.bottomEdge + 1),
+	}
+}
+
+// find the nodes that neighbor the supplied without going off edge
 func (g *Grid) neighborNodes(n Node) []Node {
 	var nodes []Node
 	checkPoints := [][]int{{n.gridX, n.gridY - 1}, {n.gridX - 1, n.gridY}, {n.gridX + 1, n.gridY}, {n.gridX, n.gridY + 1}}
@@ -94,34 +144,81 @@ func (g *Grid) neighborNodes(n Node) []Node {
 	return nodes
 }
 
+// compute estimate distance between two nodes based on distance between grid points
+func (Grid) manhattanDistance(a Node, b Node) int {
+	return int(math.Abs(float64(a.gridX-b.gridX)) + math.Abs(float64(a.gridY-b.gridY)))
+}
+
+type NodePath struct {
+	start    Node
+	goal     Node
+	from     map[Node]Node
+	Risk     int
+	Visited  int
+	GridSize int
+}
+
+func (np *NodePath) ConstructPath() []Node {
+	var path []Node
+	current := np.goal
+	for current != np.start {
+		path = append(path, current)
+		current = np.from[current]
+	}
+	path = append(path, np.start)
+	return path
+}
+
+func (np *NodePath) String() string {
+	sb := strings.Builder{}
+	sb.WriteString("Path Risk: ")
+	sb.WriteString(strconv.Itoa(np.Risk))
+	sb.WriteString(", Nodes Visited: ")
+	sb.WriteString(strconv.Itoa(np.Visited))
+	sb.WriteRune('/')
+	sb.WriteString(strconv.Itoa(np.GridSize))
+	sb.WriteString(", Path: ")
+	path := np.ConstructPath()
+	l := len(path)
+	for i := l - 1; i >= 0; i-- {
+		if i < l-1 {
+			sb.WriteString("->")
+		}
+		sb.WriteRune('(')
+		sb.WriteString(strconv.Itoa(path[i].gridY))
+		sb.WriteRune(',')
+		sb.WriteString(strconv.Itoa(path[i].gridX))
+		sb.WriteRune(')')
+	}
+	return sb.String()
+}
+
 type Node struct {
 	gridX int
 	gridY int
 	risk  int
 }
 
-type NodeQueueItem struct {
-	node     Node
-	priority int
-}
-
 type NodeQueue struct {
-	nodes []NodeQueueItem
+	nodes []nodeQueueItem
 }
 
-func (q *NodeQueue) empty() bool {
+// Empty determines if there is any node in the queue
+func (q *NodeQueue) Empty() bool {
 	return len(q.nodes) == 0
 }
 
-func (q *NodeQueue) next() Node {
+// Next retrieves the node to process based on priority
+func (q *NodeQueue) Next() Node {
 	n := len(q.nodes) - 1
 	next := q.nodes[n]
 	q.nodes = q.nodes[:n]
 	return next.node
 }
 
-func (q *NodeQueue) queue(n Node, priority int) {
-	nqi := NodeQueueItem{node: n, priority: priority}
+// Queue the supplied node based on lowest priority value being next
+func (q *NodeQueue) Queue(n Node, priority int) {
+	nqi := nodeQueueItem{node: n, priority: priority}
 
 	insertIdx := -1
 	for idx, item := range q.nodes {
@@ -131,6 +228,8 @@ func (q *NodeQueue) queue(n Node, priority int) {
 		}
 	}
 
+	// If item not before anything, just append to end, otherwise
+	// splice the existing array to add spot for new item
 	if insertIdx == -1 {
 		q.nodes = append(q.nodes, nqi)
 	} else {
@@ -139,48 +238,7 @@ func (q *NodeQueue) queue(n Node, priority int) {
 	}
 }
 
-// a* search algorithm implementation
-func search(grid *Grid, start Node, goal Node) ([]Node, int) {
-	searchQueue := NodeQueue{}
-	searchQueue.queue(start, 0)
-	from := make(map[Node]Node)
-	cost := make(map[Node]int)
-	cost[start] = 0
-
-	for !searchQueue.empty() {
-		current := searchQueue.next()
-		if current == goal {
-			break
-		}
-
-		for _, next := range grid.neighborNodes(current) {
-			nCost := cost[current] + next.risk
-			cCost, ok := cost[next]
-			if !ok || nCost < cCost {
-				cost[next] = nCost
-				priority := nCost + heuristic(next, goal)
-				searchQueue.queue(next, priority)
-				from[next] = current
-			}
-		}
-	}
-
-	return constructPath(start, goal, from)
-}
-
-func heuristic(a Node, b Node) int {
-	return int(math.Abs(float64(a.gridX-b.gridX)) + math.Abs(float64(a.gridY-b.gridY)))
-}
-
-func constructPath(start Node, goal Node, from map[Node]Node) ([]Node, int) {
-	var path []Node
-	cost := 0
-	current := goal
-	for current != start {
-		path = append(path, current)
-		cost += current.risk
-		current = from[current]
-	}
-	path = append(path, start)
-	return path, cost
+type nodeQueueItem struct {
+	node     Node
+	priority int
 }
