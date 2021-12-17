@@ -54,7 +54,7 @@ func solvePart2(line string) int {
 		}
 	}
 	end := time.Now().UnixMilli()
-	log.Printf("Day 13, Part 2 (%dms): Combos = %d", end-start, ans)
+	log.Printf("Day 17, Part 2 (%dms): Combos = %d", end-start, ans)
 	return ans
 }
 
