@@ -213,13 +213,13 @@ func (p *Pair) String() string {
 
 func (p *Pair) reduce() {
 	for {
-		// log.Printf("Before Explode ONLY Reduction: %s", p)
+		// process reductions of just explosions until no updates
 		rStack := &ReductionStack{depth: -1}
 		if p.processReduction(rStack, false) {
 			continue
 		}
 
-		// log.Printf("Before Split Reduction: %s", p)
+		// process reductions with splits...if split found, start over checking for explosions
 		rStack = &ReductionStack{depth: -1}
 		if !p.processReduction(rStack, true) {
 			break
@@ -242,7 +242,8 @@ func (p *Pair) processReduction(stack *ReductionStack, doSplit bool) bool {
 		}
 	} else {
 		if doSplit && p.lLiteral > 9 {
-			p.split(p.lLiteral, true)
+			p.lPair = p.split(p.lLiteral)
+			p.lLiteral = 0
 			return true
 		}
 		stack.lastLiteralPair = p
@@ -255,7 +256,8 @@ func (p *Pair) processReduction(stack *ReductionStack, doSplit bool) bool {
 		}
 	} else {
 		if doSplit && p.rLiteral > 9 {
-			p.split(p.rLiteral, false)
+			p.rPair = p.split(p.rLiteral)
+			p.rLiteral = 0
 			return true
 		}
 		stack.lastLiteralPair = p
@@ -315,21 +317,10 @@ func (p *Pair) findNextLiteralPair() *Pair {
 	return p.lPair.findNextLiteralPair()
 }
 
-func (p *Pair) split(value int, left bool) {
+func (p *Pair) split(value int) *Pair {
 	lValue := value / 2
-	rValue := value / 2
-	if rValue*2 < value {
-		rValue++
-	}
-
-	nPair := &Pair{parent: p, lLiteral: lValue, rLiteral: rValue}
-	if left {
-		p.lPair = nPair
-		p.lLiteral = 0
-	} else {
-		p.rPair = nPair
-		p.rLiteral = 0
-	}
+	rValue := (value / 2) + (value % 2)
+	return &Pair{parent: p, lLiteral: lValue, rLiteral: rValue}
 }
 
 type ReductionStack struct {

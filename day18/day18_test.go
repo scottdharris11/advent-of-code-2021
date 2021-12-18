@@ -120,32 +120,16 @@ func TestMagnitude(t *testing.T) {
 }
 
 func TestSplit(t *testing.T) {
-	p := &Pair{lLiteral: 10, rLiteral: 1}
-	p.split(p.lLiteral, true)
-	assert.Equal(t, 1, p.rLiteral)
-	assert.Equal(t, 0, p.lLiteral)
-	assert.NotNil(t, p.lPair)
-	assert.Equal(t, p, p.lPair.parent)
-	assert.Equal(t, 5, p.lPair.lLiteral)
-	assert.Equal(t, 5, p.lPair.rLiteral)
+	parent := &Pair{}
+	p := parent.split(10)
+	assert.Equal(t, parent, p.parent)
+	assert.Equal(t, 5, p.lLiteral)
+	assert.Equal(t, 5, p.rLiteral)
 
-	p = &Pair{lLiteral: 11, rLiteral: 1}
-	p.split(p.lLiteral, true)
-	assert.Equal(t, 1, p.rLiteral)
-	assert.Equal(t, 0, p.lLiteral)
-	assert.NotNil(t, p.lPair)
-	assert.Equal(t, p, p.lPair.parent)
-	assert.Equal(t, 5, p.lPair.lLiteral)
-	assert.Equal(t, 6, p.lPair.rLiteral)
-
-	p = &Pair{lLiteral: 1, rLiteral: 13}
-	p.split(p.rLiteral, false)
-	assert.Equal(t, 1, p.lLiteral)
-	assert.Equal(t, 0, p.rLiteral)
-	assert.NotNil(t, p.rPair)
-	assert.Equal(t, p, p.rPair.parent)
-	assert.Equal(t, 6, p.rPair.lLiteral)
-	assert.Equal(t, 7, p.rPair.rLiteral)
+	p = parent.split(11)
+	assert.Equal(t, parent, p.parent)
+	assert.Equal(t, 5, p.lLiteral)
+	assert.Equal(t, 6, p.rLiteral)
 }
 
 func TestExplode(t *testing.T) {
