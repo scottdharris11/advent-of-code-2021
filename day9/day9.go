@@ -3,7 +3,6 @@ package day9
 import (
 	"log"
 	"sort"
-	"strconv"
 	"time"
 
 	"advent-of-code-2021/utils"
@@ -40,11 +39,7 @@ func parseInput(lines []string) *CaveMap {
 	for _, line := range lines {
 		var hMapRow []int
 		for _, c := range line {
-			v, err := strconv.Atoi(string(c))
-			if err != nil {
-				log.Fatalln("unexpected bad map value", c, err)
-			}
-			hMapRow = append(hMapRow, v)
+			hMapRow = append(hMapRow, int(c-'0'))
 		}
 		hMap = append(hMap, hMapRow)
 	}
