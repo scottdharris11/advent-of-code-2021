@@ -32,25 +32,20 @@ func solvePart2(lines []string) int {
 	return score
 }
 
+var illegalCharScores = map[rune]int{')': 3, ']': 57, '}': 1197, '>': 25137}
+
 func illegalSyntaxScore(commands []string) int {
 	score := 0
 	for _, command := range commands {
 		idx, _ := illegalCharIdx(command)
 		if idx >= 0 {
-			switch command[idx] {
-			case ')':
-				score += 3
-			case ']':
-				score += 57
-			case '}':
-				score += 1197
-			case '>':
-				score += 25137
-			}
+			score += illegalCharScores[rune(command[idx])]
 		}
 	}
 	return score
 }
+
+var autoCompleteCharScores = map[rune]int{')': 1, ']': 2, '}': 3, '>': 4}
 
 func autoCompleteScore(commands []string) int {
 	var scores []int
@@ -63,16 +58,7 @@ func autoCompleteScore(commands []string) int {
 		s := 0
 		for i := l - 1; i >= 0; i-- {
 			s *= 5
-			switch stack[i] {
-			case ')':
-				s++
-			case ']':
-				s += 2
-			case '}':
-				s += 3
-			case '>':
-				s += 4
-			}
+			s += autoCompleteCharScores[stack[i]]
 		}
 		scores = append(scores, s)
 	}
@@ -81,18 +67,14 @@ func autoCompleteScore(commands []string) int {
 	return scores[middle]
 }
 
+var matchingChar = map[rune]rune{'(': ')', '[': ']', '{': '}', '<': '>'}
+
 func illegalCharIdx(cmd string) (int, []rune) {
 	var stack []rune
 	for i, c := range cmd {
 		switch c {
-		case '(':
-			stack = append(stack, ')')
-		case '[':
-			stack = append(stack, ']')
-		case '{':
-			stack = append(stack, '}')
-		case '<':
-			stack = append(stack, '>')
+		case '(', '[', '{', '<':
+			stack = append(stack, matchingChar[c])
 		default:
 			n := len(stack) - 1
 			validClose := stack[n]
