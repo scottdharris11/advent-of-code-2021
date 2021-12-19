@@ -1,10 +1,11 @@
 package day18
 
 import (
-	"advent-of-code-2021/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"advent-of-code-2021/utils"
 )
 
 var testValues = []string{
