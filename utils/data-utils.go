@@ -67,6 +67,15 @@ func ReadIntegerGrid(lines []string) [][]int {
 	return grid
 }
 
+// Number parses the supplied string into number
+func Number(s string) int {
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		log.Fatalln("bad coordinate received: ", s)
+	}
+	return n
+}
+
 // build platform independent file path
 func buildPath(dir string, filename string) string {
 	return filepath.Join(".", dir, filename)
