@@ -4,7 +4,6 @@ import (
 	"log"
 	"math"
 	"regexp"
-	"strconv"
 	"time"
 
 	"advent-of-code-2021/utils"
@@ -61,20 +60,11 @@ func solvePart2(line string) int {
 func parseInput(line string) *Area {
 	matcher := regexp.MustCompile(`^target area: x=(.+)\.\.(.+), y=(.+)\.\.(.+)$`)
 	matches := matcher.FindStringSubmatch(line)
-
-	number := func(v string) int {
-		n, err := strconv.Atoi(v)
-		if err != nil {
-			log.Fatalln("Not a number: ", v)
-		}
-		return n
-	}
-
 	return &Area{
-		minX: number(matches[1]),
-		maxX: number(matches[2]),
-		minY: number(matches[3]),
-		maxY: number(matches[4]),
+		minX: utils.Number(matches[1]),
+		maxX: utils.Number(matches[2]),
+		minY: utils.Number(matches[3]),
+		maxY: utils.Number(matches[4]),
 	}
 }
 

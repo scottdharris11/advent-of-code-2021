@@ -2,7 +2,6 @@ package day2
 
 import (
 	"log"
-	"strconv"
 	"strings"
 	"time"
 
@@ -49,10 +48,7 @@ func parseCommands(lines []string) []Command {
 
 func parseCommand(s string) Command {
 	pieces := strings.Split(s, " ")
-	unit, err := strconv.Atoi(pieces[1])
-	if err != nil {
-		log.Fatalln(err)
-	}
+	unit := utils.Number(pieces[1])
 	return Command{dir: pieces[0], unit: unit}
 }
 

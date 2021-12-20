@@ -30,11 +30,7 @@ func ReadIntegers(dir string, filename string) []int {
 	var values []int
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		val, err := strconv.Atoi(scanner.Text())
-		if err != nil {
-			log.Panicln(err)
-		}
-		values = append(values, val)
+		values = append(values, Number(scanner.Text()))
 	}
 	return values
 }
@@ -45,11 +41,7 @@ func ReadIntegersFromLine(dir string, filename string) []int {
 	sValues := strings.Split(lines[0], ",")
 	var values []int
 	for _, sValue := range sValues {
-		value, err := strconv.Atoi(sValue)
-		if err != nil {
-			log.Fatalln("non-numeric value detected", sValue, err)
-		}
-		values = append(values, value)
+		values = append(values, Number(sValue))
 	}
 	return values
 }

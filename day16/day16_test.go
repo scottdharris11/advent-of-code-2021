@@ -8,7 +8,7 @@ import (
 )
 
 func TestSolvePart1(t *testing.T) {
-	assert.Equal(t, 6, solvePart1("C200B40A82"))
+	assert.Equal(t, 14, solvePart1("C200B40A82"))
 	assert.Equal(t, 16, solvePart1("8A004A801A8002F478"))
 	assert.Equal(t, 12, solvePart1("620080001611562C8802118E34"))
 	assert.Equal(t, 23, solvePart1("C0015000016115A2E0802F182340"))

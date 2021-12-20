@@ -3,7 +3,6 @@ package day5
 import (
 	"advent-of-code-2021/utils"
 	"log"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -51,14 +50,8 @@ func parseInput(sLines []string) []Line {
 
 func parseCoordinate(s string) Coordinate {
 	pieces := strings.Split(s, ",")
-	x, err := strconv.Atoi(pieces[0])
-	if err != nil {
-		log.Fatalln("unexpected non-numeric value", x, err)
-	}
-	y, err := strconv.Atoi(pieces[1])
-	if err != nil {
-		log.Fatalln("unexpected non-numeric value", y, err)
-	}
+	x := utils.Number(pieces[0])
+	y := utils.Number(pieces[1])
 	return Coordinate{x: x, y: y}
 }
 

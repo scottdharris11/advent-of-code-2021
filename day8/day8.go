@@ -133,26 +133,22 @@ func determineValue(e Entry) int {
 	for _, v := range e.values {
 		sNum += strconv.Itoa(toDigit(signalConfig, v))
 	}
-	num, err := strconv.Atoi(sNum)
-	if err != nil {
-		log.Fatalln("Bad number conversion", err)
-	}
-	return num
+	return utils.Number(sNum)
 }
 
 func eliminate(s string, positions []int, values [][]string) [][]string {
 	for i := 0; i < len(values); i++ {
-		elimIn := true
+		eliminate := true
 		for _, position := range positions {
 			if i == position {
-				elimIn = false
+				eliminate = false
 				break
 			}
 		}
 		var nValues []string
 		for _, v := range values[i] {
 			contains := strings.Contains(s, v)
-			if !((!elimIn && !contains) || (elimIn && contains)) {
+			if !((!eliminate && !contains) || (eliminate && contains)) {
 				nValues = append(nValues, v)
 			}
 		}

@@ -2,7 +2,6 @@ package day4
 
 import (
 	"log"
-	"strconv"
 	"strings"
 	"time"
 
@@ -41,11 +40,7 @@ func parseGame(lines []string) *Game {
 	game := Game{}
 	sNums := strings.Split(lines[0], ",")
 	for _, sNum := range sNums {
-		num, err := strconv.Atoi(sNum)
-		if err != nil {
-			log.Fatalln("Invalid number detected", sNum)
-		}
-		game.numbers = append(game.numbers, num)
+		game.numbers = append(game.numbers, utils.Number(sNum))
 	}
 
 	sIdx := 2
@@ -70,11 +65,7 @@ func parseBoard(lines []string) *Board {
 			if sNum == "" {
 				continue
 			}
-			num, err := strconv.Atoi(sNum)
-			if err != nil {
-				log.Fatalln("Invalid number detected", sNum)
-			}
-			numbers[i][idx] = num
+			numbers[i][idx] = utils.Number(sNum)
 			idx++
 		}
 	}

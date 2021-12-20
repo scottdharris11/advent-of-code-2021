@@ -2,7 +2,6 @@ package day13
 
 import (
 	"log"
-	"strconv"
 	"strings"
 	"time"
 
@@ -50,14 +49,8 @@ func parseInput(lines []string) (*Paper, []Fold) {
 			break
 		}
 		sCoords := strings.Split(lines[fStart], ",")
-		x, err := strconv.Atoi(sCoords[0])
-		if err != nil {
-			log.Fatalln("unexpected x coordinate value: ", sCoords[0])
-		}
-		y, err := strconv.Atoi(sCoords[1])
-		if err != nil {
-			log.Fatalln("unexpected y coordinate value: ", sCoords[1])
-		}
+		x := utils.Number(sCoords[0])
+		y := utils.Number(sCoords[1])
 		dots = append(dots, Point{x: x, y: y})
 		if x > xMax {
 			xMax = x
@@ -85,10 +78,7 @@ func parseInput(lines []string) (*Paper, []Fold) {
 	for ; fStart < len(lines); fStart++ {
 		pieces := strings.Split(lines[fStart], " ")
 		foldCmd := strings.Split(pieces[2], "=")
-		value, err := strconv.Atoi(foldCmd[1])
-		if err != nil {
-			log.Fatalln("unexpected value in fold command")
-		}
+		value := utils.Number(foldCmd[1])
 		xVal, yVal := 0, 0
 		switch foldCmd[0] {
 		case "y":
