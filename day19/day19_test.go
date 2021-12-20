@@ -190,3 +190,20 @@ func TestScannerDeterminePosition_TestInput(t *testing.T) {
 		}
 	}
 }
+
+func TestBuildRotationFunctions(t *testing.T) {
+	c := Coordinate{1, 2, 3}
+	rFunctions := *buildRotationFunctions()
+	assert.Equal(t, 24, len(rFunctions))
+	rMap := make(map[Coordinate]map[int]int)
+	for i, rFunc := range rFunctions {
+		value := rFunc(c)
+		fMap := rMap[value]
+		if fMap == nil {
+			fMap = make(map[int]int)
+			rMap[value] = fMap
+		}
+		fMap[i]++
+	}
+	assert.Equal(t, 24, len(rMap))
+}

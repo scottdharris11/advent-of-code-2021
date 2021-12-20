@@ -65,25 +65,32 @@ func determineScannerPositions(scanners []*Scanner) {
 	scanners[0].position = &Coordinate{0, 0, 0}
 	scanners[0].originRelativeCoords = scanners[0].detectedCoords
 
+	rScanners := scanners[0:1]
 	for {
-		allPositioned := true
-		for _, s1 := range scanners {
-			if s1.position == nil {
-				continue
-			}
-			for _, s2 := range scanners {
-				if s2.position != nil {
-					continue
-				}
-				if !s2.DeterminePosition(s1, 12) {
-					allPositioned = false
-				}
-			}
-		}
+		allPositioned, newPosScanners := checkScanners(rScanners, scanners)
+		rScanners = newPosScanners
 		if allPositioned {
 			break
 		}
 	}
+}
+
+func checkScanners(relativeScanners []*Scanner, allScanners []*Scanner) (bool, []*Scanner) {
+	var nPositionedScanners []*Scanner
+	allPositioned := true
+	for _, rScanner := range relativeScanners {
+		for _, scanner := range allScanners {
+			if scanner.position != nil {
+				continue
+			}
+			if scanner.DeterminePosition(rScanner, 12) {
+				nPositionedScanners = append(nPositionedScanners, scanner)
+				continue
+			}
+			allPositioned = false
+		}
+	}
+	return allPositioned, nPositionedScanners
 }
 
 func countUniqueDetectedBeacons(scanners []*Scanner) int {
@@ -136,6 +143,7 @@ type Scanner struct {
 	position             *Coordinate
 	detectedCoords       []Coordinate
 	originRelativeCoords []Coordinate
+	rFunctions           *[]func(Coordinate) Coordinate
 }
 
 func (s *Scanner) DeterminePosition(relative *Scanner, reqMatches int) bool {
@@ -144,13 +152,17 @@ func (s *Scanner) DeterminePosition(relative *Scanner, reqMatches int) bool {
 		return true
 	}
 
+	// build function list if not already built
+	if s.rFunctions == nil {
+		s.rFunctions = buildRotationFunctions()
+	}
+
 	// map potential coordinates by subtracting each beacon on each scanner,
 	// looking for any coordinate that matched more than the required amount.
 	// if found then we will compute the origin relative coordinates for each
 	// detected position.
-	rFunctions := buildRotationFunctions()
-	for _, rFunc := range rFunctions {
-		potentialCoords := make(map[Coordinate]int)
+	for _, rFunc := range *s.rFunctions {
+		potentialCoords := make(map[Coordinate]int, len(s.detectedCoords)^2)
 		for _, s0c := range relative.originRelativeCoords {
 			for _, s1c := range s.detectedCoords {
 				potentialCoords[s0c.Subtract(rFunc(s1c))]++
@@ -176,31 +188,41 @@ func (s *Scanner) DeterminePosition(relative *Scanner, reqMatches int) bool {
 	return false
 }
 
-func buildRotationFunctions() []func(Coordinate) Coordinate {
-	var rFunc []func(Coordinate) Coordinate
+func buildRotationFunctions() *[]func(Coordinate) Coordinate {
+	// build rotation function combinations for the 3 axis
+	var rFunctions []func(Coordinate) Coordinate
 	for x := 0; x < 4; x++ {
 		for y := 0; y < 4; y++ {
 			for z := 0; z < 4; z++ {
 				xTimes := x
 				yTimes := y
 				zTimes := z
-				rFunc = append(rFunc, func(c Coordinate) Coordinate {
+				rFunctions = append(rFunctions, func(c Coordinate) Coordinate {
 					return RotateZAxis(RotateYAxis(RotateXAxis(c, xTimes), yTimes), zTimes)
 				})
 			}
 		}
 	}
-	return rFunc
+
+	// test functions with a coordinate and look for unique functions (should be 24 combos)
+	c := Coordinate{1, 2, 3}
+	rMap := make(map[Coordinate]int)
+	for i, rFunc := range rFunctions {
+		rMap[rFunc(c)] = i
+	}
+	var dFunctions []func(Coordinate) Coordinate
+	for _, idx := range rMap {
+		dFunctions = append(dFunctions, rFunctions[idx])
+	}
+	return &dFunctions
 }
 
 func RotateXAxis(c Coordinate, times int) Coordinate {
 	result := c
 	for i := 0; i < times; i++ {
-		result = Coordinate{
-			result.y,
-			-result.x,
-			result.z,
-		}
+		nY := -result.x
+		result.x = result.y
+		result.y = nY
 	}
 	return result
 }
@@ -208,11 +230,9 @@ func RotateXAxis(c Coordinate, times int) Coordinate {
 func RotateYAxis(c Coordinate, times int) Coordinate {
 	result := c
 	for i := 0; i < times; i++ {
-		result = Coordinate{
-			result.x,
-			-result.z,
-			result.y,
-		}
+		nZ := result.y
+		result.y = -result.z
+		result.z = nZ
 	}
 	return result
 }
@@ -220,11 +240,9 @@ func RotateYAxis(c Coordinate, times int) Coordinate {
 func RotateZAxis(c Coordinate, times int) Coordinate {
 	result := c
 	for i := 0; i < times; i++ {
-		result = Coordinate{
-			result.z,
-			result.y,
-			-result.x,
-		}
+		nZ := -result.x
+		result.x = result.z
+		result.z = nZ
 	}
 	return result
 }
