@@ -131,6 +131,10 @@ func (d *DeterministicDie) Roll() int {
 	return rollAmt
 }
 
+// based on having to roll the dice three times, values will be between
+// 3-9 for any given turn and will result in 27 universes being generated.
+// this array defines the universe counts based on the distribution of result
+// values that will occur.
 var quantumGameCountsByRollResult = []int{0, 0, 0, 1, 3, 6, 7, 6, 3, 1}
 
 func playWithQuantumDie(g Game, tillScore int) int {
@@ -139,7 +143,7 @@ func playWithQuantumDie(g Game, tillScore int) int {
 	activeGameCnt := 1
 	winner := make([]int, 2)
 	for activeGameCnt > 0 {
-		activeIdx := 0
+		stillActiveCnt := 0
 		nGames := make([]Game, 0, activeGameCnt)
 		for i := 0; i < activeGameCnt; i++ {
 			// for each currently active game, clone and simulate the results of 3-9 on next roll
@@ -148,18 +152,17 @@ func playWithQuantumDie(g Game, tillScore int) int {
 			pGame := games[i]
 			for m := 3; m <= 9; m++ {
 				nGame := pGame
-				count := quantumGameCountsByRollResult[m]
-				nGame.simCnt *= count
+				nGame.simCnt *= quantumGameCountsByRollResult[m]
 				if nGame.TakeTurn(m, tillScore) {
 					winner[nGame.winner-1] += nGame.simCnt
 				} else {
 					nGames = append(nGames, nGame)
-					activeIdx++
+					stillActiveCnt++
 				}
 			}
 		}
 		games = nGames
-		activeGameCnt = activeIdx
+		activeGameCnt = stillActiveCnt
 	}
 
 	highestWinner := winner[0]
