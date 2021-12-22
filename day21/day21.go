@@ -131,43 +131,40 @@ func (d *DeterministicDie) Roll() int {
 	return rollAmt
 }
 
-var quantumGameCountsByRollResult = map[int]int{3: 1, 4: 3, 5: 6, 6: 7, 7: 6, 8: 3, 9: 1}
+var quantumGameCountsByRollResult = []int{0, 0, 0, 1, 3, 6, 7, 6, 3, 1}
 
 func playWithQuantumDie(g Game, tillScore int) int {
 	g.simCnt = 1
-	var games []Game
-	games = append(games, g)
+	games := []Game{g}
 	activeGameCnt := 1
-	winner := make(map[int]int)
-	for {
-		allDone := true
+	winner := make([]int, 2)
+	for activeGameCnt > 0 {
+		activeIdx := 0
 		nGames := make([]Game, 0, activeGameCnt)
 		for i := 0; i < activeGameCnt; i++ {
 			// for each currently active game, clone and simulate the results of 3-9 on next roll
 			//   - when done, record winner count based on amount of universes the game is representing
 			//   - when not done, schedule for next turn
+			pGame := games[i]
 			for m := 3; m <= 9; m++ {
-				nGame := games[i]
+				nGame := pGame
 				count := quantumGameCountsByRollResult[m]
 				nGame.simCnt *= count
 				if nGame.TakeTurn(m, tillScore) {
-					winner[nGame.winner] += nGame.simCnt
+					winner[nGame.winner-1] += nGame.simCnt
 				} else {
-					allDone = false
 					nGames = append(nGames, nGame)
+					activeIdx++
 				}
 			}
 		}
 		games = nGames
-		activeGameCnt = len(games)
-		if allDone {
-			break
-		}
+		activeGameCnt = activeIdx
 	}
 
-	highestWinner := winner[1]
-	if winner[2] > highestWinner {
-		highestWinner = winner[2]
+	highestWinner := winner[0]
+	if winner[1] > highestWinner {
+		highestWinner = winner[1]
 	}
 	return highestWinner
 }
