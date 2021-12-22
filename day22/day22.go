@@ -95,16 +95,21 @@ func (r *Reactor) Reboot(cuboids []*Cuboid) {
 }
 
 func (r *Reactor) applyCuboid(c *Cuboid) {
+	startIdx := 0
 	for {
-		if done := r.handleIntersections(c); done {
+		done, idx := r.handleIntersections(c, startIdx)
+		startIdx = idx
+		if done {
 			break
 		}
 	}
 	r.cuboids = append(r.cuboids, c)
 }
 
-func (r *Reactor) handleIntersections(c *Cuboid) bool {
-	for i, cuboid := range r.cuboids {
+func (r *Reactor) handleIntersections(c *Cuboid, startIdx int) (bool, int) {
+	l := len(r.cuboids)
+	for i := startIdx; i < l; i++ {
+		cuboid := r.cuboids[i]
 		if !cuboid.Intersects(c) {
 			continue
 		}
@@ -114,18 +119,19 @@ func (r *Reactor) handleIntersections(c *Cuboid) bool {
 			// replacing it with the last slice entry and then trimming the slice
 			r.cuboids[i] = r.cuboids[len(r.cuboids)-1]
 			r.cuboids = r.cuboids[:len(r.cuboids)-1]
-			return false
+			return false, i
 		}
 
 		// new cuboid intersects with this one, break into cuboids that don't intersect
 		nCuboids := make([]*Cuboid, 0, len(r.cuboids)+10)
 		nCuboids = append(nCuboids, r.cuboids[0:i]...)
 		nCuboids = append(nCuboids, r.breakCuboid(cuboid, c)...)
+		restartIdx := len(nCuboids)
 		nCuboids = append(nCuboids, r.cuboids[i+1:]...)
 		r.cuboids = nCuboids
-		return false
+		return false, restartIdx
 	}
-	return true
+	return true, 0
 }
 
 func (r Reactor) breakCuboid(c *Cuboid, avoid *Cuboid) []*Cuboid {
