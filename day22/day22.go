@@ -40,12 +40,12 @@ func solvePart2(lines []string) int {
 	return ans
 }
 
-func parseInput(lines []string) []Cuboid {
+func parseInput(lines []string) []*Cuboid {
 	matcher := regexp.MustCompile(`^(.+) x=(.+)\.\.(.+),y=(.+)\.\.(.+),z=(.+)\.\.(.+)$`)
-	var cuboids []Cuboid
+	var cuboids []*Cuboid
 	for _, line := range lines {
 		groups := matcher.FindStringSubmatch(line)
-		cuboids = append(cuboids, Cuboid{
+		cuboids = append(cuboids, &Cuboid{
 			on:     groups[1] == "on",
 			xRange: [2]int{utils.Number(groups[2]), utils.Number(groups[3])},
 			yRange: [2]int{utils.Number(groups[4]), utils.Number(groups[5])},
@@ -56,7 +56,7 @@ func parseInput(lines []string) []Cuboid {
 }
 
 type Reactor struct {
-	cuboids []Cuboid
+	cuboids []*Cuboid
 }
 
 func (r *Reactor) Cubes() int {
@@ -77,7 +77,7 @@ func (r *Reactor) OnCubes() int {
 	return on
 }
 
-func (r *Reactor) Initialize(cuboids []Cuboid) {
+func (r *Reactor) Initialize(cuboids []*Cuboid) {
 	for _, c := range cuboids {
 		if c.xRange[0] < -50 || c.xRange[1] > 50 ||
 			c.yRange[0] < -50 || c.yRange[1] > 50 ||
@@ -88,13 +88,13 @@ func (r *Reactor) Initialize(cuboids []Cuboid) {
 	}
 }
 
-func (r *Reactor) Reboot(cuboids []Cuboid) {
+func (r *Reactor) Reboot(cuboids []*Cuboid) {
 	for _, c := range cuboids {
 		r.applyCuboid(c)
 	}
 }
 
-func (r *Reactor) applyCuboid(c Cuboid) {
+func (r *Reactor) applyCuboid(c *Cuboid) {
 	for {
 		if done := r.handleIntersections(c); done {
 			break
@@ -103,7 +103,7 @@ func (r *Reactor) applyCuboid(c Cuboid) {
 	r.cuboids = append(r.cuboids, c)
 }
 
-func (r *Reactor) handleIntersections(c Cuboid) bool {
+func (r *Reactor) handleIntersections(c *Cuboid) bool {
 	for i, cuboid := range r.cuboids {
 		if !cuboid.Intersects(c) {
 			continue
@@ -118,7 +118,7 @@ func (r *Reactor) handleIntersections(c Cuboid) bool {
 		}
 
 		// new cuboid intersects with this one, break into cuboids that don't intersect
-		nCuboids := make([]Cuboid, 0, len(r.cuboids)+10)
+		nCuboids := make([]*Cuboid, 0, len(r.cuboids)+10)
 		nCuboids = append(nCuboids, r.cuboids[0:i]...)
 		nCuboids = append(nCuboids, r.breakCuboid(cuboid, c)...)
 		nCuboids = append(nCuboids, r.cuboids[i+1:]...)
@@ -128,17 +128,21 @@ func (r *Reactor) handleIntersections(c Cuboid) bool {
 	return true
 }
 
-func (r Reactor) breakCuboid(c Cuboid, avoid Cuboid) []Cuboid {
-	var cuboids []Cuboid
+func (r Reactor) breakCuboid(c *Cuboid, avoid *Cuboid) []*Cuboid {
+	var cuboids []*Cuboid
 
-	xClear := r.clearRanges(c.xRange, avoid.xRange)
-	yClear := r.clearRanges(c.yRange, avoid.yRange)
-	zClear := r.clearRanges(c.zRange, avoid.zRange)
+	// find ranges on each axis that don't overlap with cuboid at all
+	xNoOverlaps := r.noOverlapRanges(c.xRange, avoid.xRange)
+	yNoOverlaps := r.noOverlapRanges(c.yRange, avoid.yRange)
+	zNoOverlaps := r.noOverlapRanges(c.zRange, avoid.zRange)
 
+	// for each non-overlap range on x-axis, add cuboid with it and current y, z ranges.
+	// track a new min, max for the x-axis to compensate if adding items later based on
+	// the y and z axis.
 	xMin := c.xRange[0]
 	xMax := c.xRange[1]
-	for _, x := range xClear {
-		cuboids = append(cuboids, Cuboid{on: c.on, xRange: x, yRange: c.yRange, zRange: c.zRange})
+	for _, x := range xNoOverlaps {
+		cuboids = append(cuboids, &Cuboid{on: c.on, xRange: x, yRange: c.yRange, zRange: c.zRange})
 		if x[1] < xMax {
 			xMin = x[1] + 1
 		}
@@ -147,10 +151,12 @@ func (r Reactor) breakCuboid(c Cuboid, avoid Cuboid) []Cuboid {
 		}
 	}
 
+	// for each non-overlap on y-axis, add cuboid with it, current z ranges, and the adjusted x-axis range
+	// track a new min, max for y-axis to compensate if adding items later based on z axis
 	yMin := c.yRange[0]
 	yMax := c.yRange[1]
-	for _, y := range yClear {
-		cuboids = append(cuboids, Cuboid{on: c.on, xRange: [2]int{xMin, xMax}, yRange: y, zRange: c.zRange})
+	for _, y := range yNoOverlaps {
+		cuboids = append(cuboids, &Cuboid{on: c.on, xRange: [2]int{xMin, xMax}, yRange: y, zRange: c.zRange})
 		if y[1] < yMax {
 			yMin = y[1] + 1
 		}
@@ -159,14 +165,15 @@ func (r Reactor) breakCuboid(c Cuboid, avoid Cuboid) []Cuboid {
 		}
 	}
 
-	for _, z := range zClear {
-		cuboids = append(cuboids, Cuboid{on: c.on, xRange: [2]int{xMin, xMax}, yRange: [2]int{yMin, yMax}, zRange: z})
+	// for each non-overlap on z-axis, add cuboid with it and adjusted x, y ranges
+	for _, z := range zNoOverlaps {
+		cuboids = append(cuboids, &Cuboid{on: c.on, xRange: [2]int{xMin, xMax}, yRange: [2]int{yMin, yMax}, zRange: z})
 	}
 
 	return cuboids
 }
 
-func (Reactor) clearRanges(check [2]int, avoid [2]int) [][2]int {
+func (Reactor) noOverlapRanges(check [2]int, avoid [2]int) [][2]int {
 	var ranges [][2]int
 	if check[0] < avoid[0] {
 		ranges = append(ranges, [2]int{check[0], avoid[0] - 1})
@@ -184,23 +191,23 @@ type Cuboid struct {
 	on     bool
 }
 
-func (c *Cuboid) Cubes() int {
+func (c Cuboid) Cubes() int {
 	return c.rangeSize(c.xRange) * c.rangeSize(c.yRange) * c.rangeSize(c.zRange)
 }
 
-func (c *Cuboid) Intersects(c2 Cuboid) bool {
+func (c Cuboid) Intersects(c2 *Cuboid) bool {
 	return c.rangeIntersects(c.xRange, c2.xRange) &&
 		c.rangeIntersects(c.yRange, c2.yRange) &&
 		c.rangeIntersects(c.zRange, c2.zRange)
 }
 
-func (c *Cuboid) Overlays(c2 Cuboid) bool {
+func (c Cuboid) Overlays(c2 *Cuboid) bool {
 	return c.rangeOverlays(c.xRange, c2.xRange) &&
 		c.rangeOverlays(c.yRange, c2.yRange) &&
 		c.rangeOverlays(c.zRange, c2.zRange)
 }
 
-func (c *Cuboid) String() string {
+func (c Cuboid) String() string {
 	return fmt.Sprintf("%t %d x=%d..%d, y=%d..%d, z=%d..%d",
 		c.on, c.Cubes(), c.xRange[0], c.xRange[1], c.yRange[0], c.yRange[1], c.zRange[0], c.zRange[1])
 }

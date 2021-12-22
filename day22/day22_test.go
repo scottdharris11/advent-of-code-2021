@@ -74,7 +74,12 @@ func TestReactor_BreakCuboid(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			assert.ElementsMatch(t, tt.expected, Reactor{}.breakCuboid(tt.original, tt.avoid))
+			oCuboids := Reactor{}.breakCuboid(&tt.original, &tt.avoid)
+			var nCuboids []Cuboid
+			for _, c := range oCuboids {
+				nCuboids = append(nCuboids, *c)
+			}
+			assert.ElementsMatch(t, tt.expected, nCuboids)
 		})
 	}
 }
@@ -95,7 +100,7 @@ func TestReactor_ClearRanges(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			assert.ElementsMatch(t, tt.expected, Reactor{}.clearRanges(tt.check, tt.avoid))
+			assert.ElementsMatch(t, tt.expected, Reactor{}.noOverlapRanges(tt.check, tt.avoid))
 		})
 	}
 }
@@ -181,10 +186,10 @@ func TestCuboid_IntersectsAndOverlays(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.intersects, tt.cuboid1.Intersects(tt.cuboid2))
-			assert.Equal(t, tt.intersects, tt.cuboid2.Intersects(tt.cuboid1))
-			assert.Equal(t, tt.over12, tt.cuboid1.Overlays(tt.cuboid2))
-			assert.Equal(t, tt.over21, tt.cuboid2.Overlays(tt.cuboid1))
+			assert.Equal(t, tt.intersects, tt.cuboid1.Intersects(&tt.cuboid2))
+			assert.Equal(t, tt.intersects, tt.cuboid2.Intersects(&tt.cuboid1))
+			assert.Equal(t, tt.over12, tt.cuboid1.Overlays(&tt.cuboid2))
+			assert.Equal(t, tt.over21, tt.cuboid2.Overlays(&tt.cuboid1))
 		})
 	}
 }
