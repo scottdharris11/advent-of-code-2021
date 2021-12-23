@@ -96,7 +96,7 @@ type Grid struct {
 func (g *Grid) BestPath() *NodePath {
 	start := g.nodes[0][0]
 	goal := g.nodes[g.bottomEdge][g.rightEdge]
-	searchQueue := NodeQueue{}
+	searchQueue := utils.PriorityQueue{}
 	searchQueue.Queue(start, 0)
 	from := make(map[Node]Node)
 	cost := make(map[Node]int)
@@ -104,7 +104,7 @@ func (g *Grid) BestPath() *NodePath {
 	cost[start] = 0
 
 	for !searchQueue.Empty() {
-		current := searchQueue.Next()
+		var current = searchQueue.Next().(Node)
 		visited[current] = true
 		if current == goal {
 			break
@@ -197,48 +197,4 @@ type Node struct {
 	gridX int
 	gridY int
 	risk  int
-}
-
-type NodeQueue struct {
-	nodes []nodeQueueItem
-}
-
-// Empty determines if there is any node in the queue
-func (q *NodeQueue) Empty() bool {
-	return len(q.nodes) == 0
-}
-
-// Next retrieves the node to process based on priority
-func (q *NodeQueue) Next() Node {
-	n := len(q.nodes) - 1
-	next := q.nodes[n]
-	q.nodes = q.nodes[:n]
-	return next.node
-}
-
-// Queue the supplied node based on lowest priority value being next
-func (q *NodeQueue) Queue(n Node, priority int) {
-	nqi := nodeQueueItem{node: n, priority: priority}
-
-	insertIdx := -1
-	for idx, item := range q.nodes {
-		if item.priority < priority {
-			insertIdx = idx
-			break
-		}
-	}
-
-	// If item not before anything, just append to end, otherwise
-	// splice the existing array to add spot for new item
-	if insertIdx == -1 {
-		q.nodes = append(q.nodes, nqi)
-	} else {
-		q.nodes = append(q.nodes[:insertIdx+1], q.nodes[insertIdx:]...)
-		q.nodes[insertIdx] = nqi
-	}
-}
-
-type nodeQueueItem struct {
-	node     Node
-	priority int
 }
