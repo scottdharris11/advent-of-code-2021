@@ -14,7 +14,8 @@ type Puzzle struct{}
 func (Puzzle) Solve() {
 	lines := utils.ReadLines("day23", "day-23-input.txt")
 	solvePart1(lines)
-	// solvePart2(lines)
+	lines = utils.ReadLines("day23", "day-23-input2.txt")
+	solvePart2(lines)
 }
 
 func solvePart1(lines []string) int {
@@ -141,52 +142,54 @@ func (s *BurrowState) PossibleMoves() []Move {
 		a := s.amphipods[i]
 		// determine if amphipod is currently in room or hall, when...
 		//   a. in a room at bottom of same type -> nothing to do...at goal
-		//   b. in a room of wrong type -> check to see if blocked -> when not, move to hall
+		//   b. in a room of wrong type -> check to see if blocked -> when not, move to hall (or goal room if avail)
 		//   c. in a room at top of same type -> check to see if blocking a different type -> if so, move to hall
-		//   d. in hall -> check for blockers on path to room -> when none, move to room
 		room, sType, bottom := s.burrow.Room(a.locX, a.locY, a.aType)
 		if room {
 			if sType && bottom {
 				continue
 			}
 
-			roomTop := s.burrow.roomCoords[a.aType][1]
+			roomCoords := s.burrow.roomCoords[a.aType]
 
 			if !sType {
-				y := a.locY - 1
-				blocked := false
-				for y >= roomTop {
-					if s.amphipodAt(a.locX, y) != nil {
-						blocked = true
-						break
+				if s.pathToHallAvailable(a, roomCoords[1]) {
+					if avail, state := s.hallToRoomMove(a); avail {
+						moves = append(moves, *state)
+					} else {
+						moves = append(moves, s.hallFromRoomMoves(a, roomCoords[1])...)
 					}
-					y--
-				}
-				if !blocked {
-					moves = append(moves, s.hallFromRoomMoves(a, roomTop)...)
 				}
 				continue
 			}
 
 			if s.blocking(a) {
-				moves = append(moves, s.hallFromRoomMoves(a, roomTop)...)
+				moves = append(moves, s.hallFromRoomMoves(a, roomCoords[1])...)
 			}
 			continue
 		}
-		if state := s.hallToRoomMove(a); state != nil {
+
+		// in hall -> check for blockers on path to room -> when none, move to room
+		if avail, state := s.hallToRoomMove(a); avail {
 			moves = append(moves, *state)
 		}
 	}
 	return moves
 }
 
-func (s *BurrowState) MoveAmphipod(fromX int, fromY int, toX int, toY int) int {
+func (s *BurrowState) MoveAmphipod(fromX int, fromY int, toX int, toY int, hallY int) int {
+	steps := int(math.Abs(float64(fromX - toX)))
+	if toY == hallY || fromY == hallY {
+		steps += int(math.Abs(float64(fromY - toY)))
+	} else {
+		steps += int(math.Abs(float64(fromY - hallY)))
+		steps += int(math.Abs(float64(toY - hallY)))
+	}
+
 	a := s.amphipodAt(fromX, fromY)
-	steps := int(math.Abs(float64(fromX-toX)) + math.Abs(float64(fromY-toY)))
-	energyUsed := steps * a.energyPerStep
 	a.locX = toX
 	a.locY = toY
-	return energyUsed
+	return steps * a.energyPerStep
 }
 
 func (s *BurrowState) DistanceFromGoal() int {
@@ -283,7 +286,7 @@ func (s *BurrowState) hallFromRoomMoves(a Amphipod, roomTop int) []Move {
 			}
 
 			nState := s.Copy()
-			energyUsed := nState.MoveAmphipod(a.locX, a.locY, hallX, hallY)
+			energyUsed := nState.MoveAmphipod(a.locX, a.locY, hallX, hallY, hallY)
 			moves = append(moves, Move{state: *nState, energyUsed: energyUsed})
 		}
 	}
@@ -292,46 +295,80 @@ func (s *BurrowState) hallFromRoomMoves(a Amphipod, roomTop int) []Move {
 	return moves
 }
 
-func (s *BurrowState) hallToRoomMove(a Amphipod) *Move {
-	roomCoords := s.burrow.roomCoords[a.aType]
-
+func (s *BurrowState) hallToRoomMove(a Amphipod) (bool, *Move) {
 	// check to see if the room is empty or only contains proper types
-	roomY := roomCoords[1] - 1
-	for {
-		roomA := s.amphipodAt(roomCoords[0], roomY+1)
-		if roomA != nil {
-			if roomA.locY == roomCoords[1] {
-				return nil
-			}
-			if roomA.aType != a.aType {
-				return nil
-			}
-			break
-		}
-		roomY++
-		if !s.burrow.Space(roomCoords[0], roomY+1) {
-			break
-		}
+	roomCoords := s.burrow.roomCoords[a.aType]
+	avail, roomY := s.roomAvailable(a.aType, roomCoords)
+	if !avail {
+		return false, nil
 	}
 
 	// walk path to the room entrance, if all clear, create new state
-	hallX := a.locX
+	avail, roomX := s.pathToRoomAvailable(a.locX, roomCoords)
+	if avail {
+		nState := s.Copy()
+		energyUsed := nState.MoveAmphipod(a.locX, a.locY, roomX, roomY, roomCoords[1]-1)
+		return true, &Move{state: *nState, energyUsed: energyUsed}
+	}
+	return false, nil
+}
+
+// check to see if the room is empty or only contains proper types
+func (s *BurrowState) roomAvailable(aType rune, roomCoords [2]int) (bool, int) {
+	firstEmptyY := -1
+	workY := roomCoords[1]
+	for {
+		roomA := s.amphipodAt(roomCoords[0], workY)
+		if roomA != nil {
+			// First Entry Occupied
+			if roomA.locY == roomCoords[1] {
+				return false, -1
+			}
+
+			// Room contains wrong type
+			if roomA.aType != aType {
+				return false, -1
+			}
+		} else {
+			firstEmptyY = workY
+		}
+		workY++
+		if !s.burrow.Space(roomCoords[0], workY) {
+			break
+		}
+	}
+	return true, firstEmptyY
+}
+
+// walk path to the room entrance to determine if all clear
+func (s *BurrowState) pathToRoomAvailable(currentX int, roomCoords [2]int) (bool, int) {
+	hallX := currentX
 	xAdd := 1
-	if a.locX > roomCoords[0] {
+	if currentX > roomCoords[0] {
 		xAdd = -1
 	}
 	for {
 		hallX += xAdd
 		if hallX == roomCoords[0] {
-			nState := s.Copy()
-			energyUsed := nState.MoveAmphipod(a.locX, a.locY, hallX, roomY)
-			return &Move{state: *nState, energyUsed: energyUsed}
+			return true, roomCoords[0]
 		}
-		if s.amphipodAt(hallX, a.locY) != nil {
+		if s.amphipodAt(hallX, roomCoords[1]-1) != nil {
 			break
 		}
 	}
-	return nil
+	return false, -1
+}
+
+// check if path to hall is clear
+func (s *BurrowState) pathToHallAvailable(a Amphipod, roomTop int) bool {
+	y := a.locY - 1
+	for y >= roomTop {
+		if s.amphipodAt(a.locX, y) != nil {
+			return false
+		}
+		y--
+	}
+	return true
 }
 
 type Move struct {
@@ -372,12 +409,10 @@ func BestSolution(b BurrowState) int {
 	}
 
 	// Print path
-	/*
-	   	current := goal
-	       for current != b {
-	           fmt.Println(current.String())
-	           current = from[current]
-	       }
-	*/
+	// current := goal
+	// for current != b {
+	//   fmt.Println(current.String())
+	//   current = from[current]
+	// }
 	return cost[goal]
 }

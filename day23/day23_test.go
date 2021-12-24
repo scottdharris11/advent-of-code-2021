@@ -13,8 +13,8 @@ func TestSolvePart1(t *testing.T) {
 }
 
 func TestSolvePart2(t *testing.T) {
-	// assert.Equal(t, 44169, solvePart2(utils.ReadLines("day23", "day-23-test2.txt")))
-	// assert.Equal(t, 0, solvePart2(utils.ReadLines("day23", "day-23-input2.txt")))
+	assert.Equal(t, 44169, solvePart2(utils.ReadLines("day23", "day-23-test2.txt")))
+	assert.Equal(t, 43814, solvePart2(utils.ReadLines("day23", "day-23-input2.txt")))
 }
 
 func TestBurrow_Space(t *testing.T) {
@@ -148,24 +148,8 @@ func TestBurrowState_PossibleMoves(t *testing.T) {
 			{aType: 'A', locX: 5, locY: 2, energyPerStep: 1},
 			{aType: 'A', locX: 5, locY: 3, energyPerStep: 1},
 		}}, []Move{
-			{energyUsed: 2, state: BurrowState{burrow: burrow, amphipodCnt: 2, amphipods: [16]Amphipod{
-				{aType: 'A', locX: 4, locY: 1, energyPerStep: 1},
-				{aType: 'A', locX: 5, locY: 3, energyPerStep: 1},
-			}}},
-			{energyUsed: 4, state: BurrowState{burrow: burrow, amphipodCnt: 2, amphipods: [16]Amphipod{
-				{aType: 'A', locX: 2, locY: 1, energyPerStep: 1},
-				{aType: 'A', locX: 5, locY: 3, energyPerStep: 1},
-			}}},
 			{energyUsed: 5, state: BurrowState{burrow: burrow, amphipodCnt: 2, amphipods: [16]Amphipod{
-				{aType: 'A', locX: 1, locY: 1, energyPerStep: 1},
-				{aType: 'A', locX: 5, locY: 3, energyPerStep: 1},
-			}}},
-			{energyUsed: 2, state: BurrowState{burrow: burrow, amphipodCnt: 2, amphipods: [16]Amphipod{
-				{aType: 'A', locX: 6, locY: 1, energyPerStep: 1},
-				{aType: 'A', locX: 5, locY: 3, energyPerStep: 1},
-			}}},
-			{energyUsed: 3, state: BurrowState{burrow: burrow, amphipodCnt: 2, amphipods: [16]Amphipod{
-				{aType: 'A', locX: 7, locY: 1, energyPerStep: 1},
+				{aType: 'A', locX: 3, locY: 3, energyPerStep: 1},
 				{aType: 'A', locX: 5, locY: 3, energyPerStep: 1},
 			}}},
 		}},
@@ -288,6 +272,57 @@ func TestBurrowState_Occupied(t *testing.T) {
 			occupied, a := state.Occupied(tt.x, tt.y)
 			assert.Equal(t, tt.occupied, occupied)
 			assert.Equal(t, tt.aPtr, a)
+		})
+	}
+}
+
+func TestBurrowState_RoomAvailable(t *testing.T) {
+	burrow := &Burrow{
+		diagram: [][]rune{
+			[]rune("#########"),
+			[]rune("#.......#"),
+			[]rune("###.#.###"),
+			[]rune("  #.#.#"),
+			[]rune("  #.#.#"),
+			[]rune("  #####"),
+		},
+		roomCoords: map[rune][2]int{
+			'A': {3, 2},
+			'B': {5, 2},
+		},
+	}
+
+	tests := []struct {
+		name      string
+		state     BurrowState
+		aType     rune
+		available bool
+		firstIdx  int
+	}{
+		{"1", BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
+			{aType: 'A', locX: 3, locY: 3, energyPerStep: 1},
+			{aType: 'A', locX: 3, locY: 4, energyPerStep: 1},
+			{aType: 'B', locX: 7, locY: 1, energyPerStep: 10},
+		}}, 'A', true, 2},
+
+		{"2", BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
+			{aType: 'A', locX: 1, locY: 1, energyPerStep: 1},
+			{aType: 'A', locX: 3, locY: 3, energyPerStep: 1},
+			{aType: 'B', locX: 3, locY: 4, energyPerStep: 10},
+		}}, 'A', false, -1},
+
+		{"3", BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
+			{aType: 'A', locX: 1, locY: 1, energyPerStep: 1},
+			{aType: 'A', locX: 1, locY: 2, energyPerStep: 1},
+			{aType: 'B', locX: 5, locY: 4, energyPerStep: 10},
+		}}, 'A', true, 4},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			avail, idx := tt.state.roomAvailable(tt.aType, tt.state.burrow.roomCoords[tt.aType])
+			assert.Equal(t, tt.available, avail)
+			assert.Equal(t, tt.firstIdx, idx)
 		})
 	}
 }
