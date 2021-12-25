@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"errors"
 	"log"
 	"os"
 	"path/filepath"
@@ -66,6 +67,15 @@ func Number(s string) int {
 		log.Fatalln("bad coordinate received: ", s)
 	}
 	return n
+}
+
+// FilePath builds path to file with supplied directory if exists, otherwise current directory
+func FilePath(dir string, filename string) string {
+	_, err := os.Stat(dir)
+	if errors.Is(err, os.ErrNotExist) {
+		return buildPath(".", filename)
+	}
+	return buildPath(dir, filename)
 }
 
 // build platform independent file path
