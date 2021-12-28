@@ -142,13 +142,13 @@ func TestBurrowState_PossibleMoves(t *testing.T) {
 	tests := []struct {
 		name     string
 		state    BurrowState
-		possible []Move
+		possible []utils.SearchMove
 	}{
 		{"1", BurrowState{burrow: burrow, amphipodCnt: 2, amphipods: [16]Amphipod{
 			{aType: 'A', locX: 5, locY: 2, energyPerStep: 1},
 			{aType: 'A', locX: 5, locY: 3, energyPerStep: 1},
-		}}, []Move{
-			{energyUsed: 5, state: BurrowState{burrow: burrow, amphipodCnt: 2, amphipods: [16]Amphipod{
+		}}, []utils.SearchMove{
+			{Cost: 5, State: BurrowState{burrow: burrow, amphipodCnt: 2, amphipods: [16]Amphipod{
 				{aType: 'A', locX: 3, locY: 3, energyPerStep: 1},
 				{aType: 'A', locX: 5, locY: 3, energyPerStep: 1},
 			}}},
@@ -157,13 +157,13 @@ func TestBurrowState_PossibleMoves(t *testing.T) {
 			{aType: 'A', locX: 1, locY: 1, energyPerStep: 1},
 			{aType: 'A', locX: 3, locY: 3, energyPerStep: 1},
 			{aType: 'B', locX: 7, locY: 1, energyPerStep: 10},
-		}}, []Move{
-			{energyUsed: 3, state: BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
+		}}, []utils.SearchMove{
+			{Cost: 3, State: BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
 				{aType: 'A', locX: 3, locY: 2, energyPerStep: 1},
 				{aType: 'A', locX: 3, locY: 3, energyPerStep: 1},
 				{aType: 'B', locX: 7, locY: 1, energyPerStep: 10},
 			}}},
-			{energyUsed: 40, state: BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
+			{Cost: 40, State: BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
 				{aType: 'A', locX: 1, locY: 1, energyPerStep: 1},
 				{aType: 'A', locX: 3, locY: 3, energyPerStep: 1},
 				{aType: 'B', locX: 5, locY: 3, energyPerStep: 10},
@@ -173,8 +173,8 @@ func TestBurrowState_PossibleMoves(t *testing.T) {
 			{aType: 'A', locX: 4, locY: 1, energyPerStep: 1},
 			{aType: 'A', locX: 5, locY: 3, energyPerStep: 1},
 			{aType: 'B', locX: 6, locY: 1, energyPerStep: 10},
-		}}, []Move{
-			{energyUsed: 3, state: BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
+		}}, []utils.SearchMove{
+			{Cost: 3, State: BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
 				{aType: 'A', locX: 3, locY: 3, energyPerStep: 1},
 				{aType: 'A', locX: 5, locY: 3, energyPerStep: 1},
 				{aType: 'B', locX: 6, locY: 1, energyPerStep: 10},
@@ -184,13 +184,13 @@ func TestBurrowState_PossibleMoves(t *testing.T) {
 			{aType: 'A', locX: 1, locY: 1, energyPerStep: 1},
 			{aType: 'A', locX: 6, locY: 1, energyPerStep: 1},
 			{aType: 'B', locX: 7, locY: 1, energyPerStep: 10},
-		}}, []Move{
-			{energyUsed: 4, state: BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
+		}}, []utils.SearchMove{
+			{Cost: 4, State: BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
 				{aType: 'A', locX: 3, locY: 3, energyPerStep: 1},
 				{aType: 'A', locX: 6, locY: 1, energyPerStep: 1},
 				{aType: 'B', locX: 7, locY: 1, energyPerStep: 10},
 			}}},
-			{energyUsed: 5, state: BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
+			{Cost: 5, State: BurrowState{burrow: burrow, amphipodCnt: 3, amphipods: [16]Amphipod{
 				{aType: 'A', locX: 1, locY: 1, energyPerStep: 1},
 				{aType: 'A', locX: 3, locY: 3, energyPerStep: 1},
 				{aType: 'B', locX: 7, locY: 1, energyPerStep: 10},

@@ -21,7 +21,9 @@ func (Puzzle) Solve() {
 func solvePart1(lines []string) int {
 	state := parseInput(lines)
 	start := time.Now().UnixMilli()
-	ans := BestSolution(*state)
+	search := utils.Search{Searcher: BurrowSearcher{}}
+	solution := search.Best(utils.SearchMove{State: *state})
+	ans := solution.Cost
 	end := time.Now().UnixMilli()
 	log.Printf("Day 23, Part 1 (%dms): Least energy = %d", end-start, ans)
 	return ans
@@ -30,7 +32,9 @@ func solvePart1(lines []string) int {
 func solvePart2(lines []string) int {
 	state := parseInput(lines)
 	start := time.Now().UnixMilli()
-	ans := BestSolution(*state)
+	search := utils.Search{Searcher: BurrowSearcher{}}
+	solution := search.Best(utils.SearchMove{State: *state})
+	ans := solution.Cost
 	end := time.Now().UnixMilli()
 	log.Printf("Day 23, Part 2 (%dms): Least energy = %d", end-start, ans)
 	return ans
@@ -136,8 +140,8 @@ func (s *BurrowState) Goal() bool {
 	return true
 }
 
-func (s *BurrowState) PossibleMoves() []Move {
-	var moves []Move
+func (s *BurrowState) PossibleMoves() []utils.SearchMove {
+	var moves []utils.SearchMove
 	for i := 0; i < s.amphipodCnt; i++ {
 		a := s.amphipods[i]
 		// determine if amphipod is currently in room or hall, when...
@@ -267,12 +271,12 @@ func (s *BurrowState) blocking(a Amphipod) bool {
 	return false
 }
 
-func (s *BurrowState) hallFromRoomMoves(a Amphipod, roomTop int) []Move {
+func (s *BurrowState) hallFromRoomMoves(a Amphipod, roomTop int) []utils.SearchMove {
 	// position on hall row
 	hallY := roomTop - 1
 
 	// walk to the left/right until wall or blocked and record valid states
-	var moves []Move
+	var moves []utils.SearchMove
 	walkHall := func(xAdd int) {
 		hallX := a.locX
 		for {
@@ -287,7 +291,7 @@ func (s *BurrowState) hallFromRoomMoves(a Amphipod, roomTop int) []Move {
 
 			nState := s.Copy()
 			energyUsed := nState.MoveAmphipod(a.locX, a.locY, hallX, hallY, hallY)
-			moves = append(moves, Move{state: *nState, energyUsed: energyUsed})
+			moves = append(moves, utils.SearchMove{State: *nState, Cost: energyUsed})
 		}
 	}
 	walkHall(1)
@@ -295,7 +299,7 @@ func (s *BurrowState) hallFromRoomMoves(a Amphipod, roomTop int) []Move {
 	return moves
 }
 
-func (s *BurrowState) hallToRoomMove(a Amphipod) (bool, *Move) {
+func (s *BurrowState) hallToRoomMove(a Amphipod) (bool, *utils.SearchMove) {
 	// check to see if the room is empty or only contains proper types
 	roomCoords := s.burrow.roomCoords[a.aType]
 	avail, roomY := s.roomAvailable(a.aType, roomCoords)
@@ -308,7 +312,7 @@ func (s *BurrowState) hallToRoomMove(a Amphipod) (bool, *Move) {
 	if avail {
 		nState := s.Copy()
 		energyUsed := nState.MoveAmphipod(a.locX, a.locY, roomX, roomY, roomCoords[1]-1)
-		return true, &Move{state: *nState, energyUsed: energyUsed}
+		return true, &utils.SearchMove{State: *nState, Cost: energyUsed}
 	}
 	return false, nil
 }
@@ -371,48 +375,19 @@ func (s *BurrowState) pathToHallAvailable(a Amphipod, roomTop int) bool {
 	return true
 }
 
-type Move struct {
-	state      BurrowState
-	energyUsed int
+type BurrowSearcher struct{}
+
+func (BurrowSearcher) Goal(state interface{}) bool {
+	burrowState := state.(BurrowState)
+	return burrowState.Goal()
 }
 
-// BestSolution a-star search algorithm implementation:
-//   process moves from start to goal using a priority queue based on
-//   cost (energy used) to get to the current state plus the estimated
-//   distance to the goal
-func BestSolution(b BurrowState) int {
-	searchQueue := utils.PriorityQueue{}
-	searchQueue.Queue(b, 0)
-	cost := make(map[BurrowState]int)
-	from := make(map[BurrowState]BurrowState)
-	cost[b] = 0
-	var goal BurrowState
-	for !searchQueue.Empty() {
-		var current = searchQueue.Next().(BurrowState)
-		// log.Println(current.String())
-		if current.Goal() {
-			goal = current
-			break
-		}
+func (BurrowSearcher) PossibleNextMoves(state interface{}) []utils.SearchMove {
+	burrowState := state.(BurrowState)
+	return burrowState.PossibleMoves()
+}
 
-		for _, next := range current.PossibleMoves() {
-			nCost := cost[current] + next.energyUsed
-			cCost, ok := cost[next.state]
-			if !ok || nCost < cCost {
-				cost[next.state] = nCost
-				// log.Println("Possible Next...", next.String())
-				priority := nCost + next.state.DistanceFromGoal()
-				searchQueue.Queue(next.state, priority)
-				from[next.state] = current
-			}
-		}
-	}
-
-	// Print path
-	// current := goal
-	// for current != b {
-	//   fmt.Println(current.String())
-	//   current = from[current]
-	// }
-	return cost[goal]
+func (BurrowSearcher) DistanceFromGoal(state interface{}) int {
+	burrowState := state.(BurrowState)
+	return burrowState.DistanceFromGoal()
 }
